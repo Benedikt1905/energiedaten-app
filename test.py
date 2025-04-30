@@ -40,7 +40,7 @@ def open_file():
 
 # Tkinter-Fenster erstellen
 root = tk.Tk()
-root.title("Primärenergieverbrauch")
+root.title("Primärenergieverbrauch v1.0")
 
 # Festgelegter Pfad für das Icon
 base_path = os.path.dirname(os.path.abspath(__file__))
