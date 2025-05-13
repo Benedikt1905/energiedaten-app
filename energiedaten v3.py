@@ -146,7 +146,7 @@ def update_dropdowns():
     except Exception as e:
         messagebox.showerror("Fehler beim Aktualisieren der Dropdown-Menüs", str(e))
 
-# Kreisdiagramm aktualisieren (mit 3D-Effekt)
+# Kreisdiagramm aktualisieren
 def update_pie_chart():
     try:
         selected_year = year_var.get()
@@ -215,10 +215,24 @@ def display_data():
     except Exception as e:
         messagebox.showerror("Fehler beim Anzeigen der Daten", str(e))
 
+
+# Footer-Frame
+footer_frame = tk.Frame(root, bg="lightgrey", height=30)
+footer_frame.pack(side="bottom", fill="x")
+
+# Text für den Footer
+footer_label = tk.Label(
+    footer_frame,
+    text="2025 | made by Benedikt Krings | Version: 3.1.1",
+    font=("Arial", 12),
+    bg="lightgrey",
+    fg="black"
+)
+footer_label.pack(pady=5)
+
 # Start der Anwendung
 country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien"]
 country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db())
 country_dropdown.current(0)
 load_csv_or_json_or_db()
 root.mainloop()
-
