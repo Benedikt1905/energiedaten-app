@@ -6,11 +6,10 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import sqlite3
 import os
 
-# Hauptfenster
+# main window with icon
 root = tk.Tk()
 root.title("Primärenergieverbrauch")
-
-# Pfad zur Icon-Datei
+root.config(bg="white")
 base_path = os.path.dirname(os.path.abspath(__file__))
 icon_path = os.path.join(base_path, "img/dbay-icon.ico")
 if os.path.exists(icon_path):
@@ -18,68 +17,64 @@ if os.path.exists(icon_path):
 else:
     print(f"Icon-Datei '{icon_path}' nicht gefunden. Standard-Icon wird verwendet.")
 
-# Pfade zu den Dateien
+# path to data files
 file_path_de = r'data/Primärverbrauch DE.csv'
 file_path_fr = r'data/Primärverbrauch FR.json'
 file_path_gb = r'data/Primärverbrauch GB.db'
 
-# Globale Variablen
+# global variables
 df = pd.DataFrame()
 country_var = tk.StringVar()
 energy_var = tk.StringVar()
 year_var = tk.StringVar()
 
-# Layout-Struktur
-top_frame = tk.Frame(root)
+# Top-Frame für Dropdown-Menüs
+top_frame = tk.Frame(root, bg="white")
 top_frame.pack(pady=10)
 
-# Stil für die Dropdown-Menüs anpassen
+# Styles für Dropdown-Menüs
 style = ttk.Style()
-style.configure("TCombobox", font=("Arial", 20))
-style.map("TCombobox",
-          fieldbackground=[("readonly", "white")],
-          background=[("readonly", "white")],
-          foreground=[("readonly", "black")])
+style.configure("TCombobox", font=("Arial", 20), fieldbackground="white", background="white", foreground="black")
 
-# Dropdown-Menüs
-tk.Label(top_frame, text="Land:", font=("Arial", 16)).grid(row=0, column=0, padx=5, pady=5, sticky="w")
+# Dropdown-Menüs für Land, Energieträger und Jahr
+tk.Label(top_frame, text="Land:", font=("Arial", 16), bg="white", fg="black").grid(row=0, column=0, padx=5, pady=5, sticky="w")
 country_dropdown = ttk.Combobox(top_frame, textvariable=country_var, state="readonly", style="TCombobox", font=("Arial", 16))
 country_dropdown.grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
-tk.Label(top_frame, text="Energieträger:", font=("Arial", 16)).grid(row=1, column=0, padx=5, pady=5, sticky="w")
+tk.Label(top_frame, text="Energieträger:", font=("Arial", 16), bg="white", fg="black").grid(row=1, column=0, padx=5, pady=5, sticky="w")
 energy_dropdown = ttk.Combobox(top_frame, textvariable=energy_var, state="readonly", style="TCombobox", font=("Arial", 16))
 energy_dropdown.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
-tk.Label(top_frame, text="Jahr:", font=("Arial", 16)).grid(row=2, column=0, padx=5, pady=5, sticky="w")
+tk.Label(top_frame, text="Jahr:", font=("Arial", 16), bg="white", fg="black").grid(row=2, column=0, padx=5, pady=5, sticky="w")
 year_dropdown = ttk.Combobox(top_frame, textvariable=year_var, state="readonly", style="TCombobox", font=("Arial", 16))
 year_dropdown.grid(row=2, column=1, padx=5, pady=5, sticky="w")
 
-middle_frame = tk.Frame(root)
+# Middle-Frame für Statistik-Labels und Kreisdiagramm
+middle_frame = tk.Frame(root, bg="white")
 middle_frame.pack(pady=10)
 
 # Statistik-Labels
 stat_labels = {}
 for i, label in enumerate(["Maximaler Jahresverbrauch", "Durchschn. Jahresverbrauch", "Minimaler Jahresverbrauch"]):
-    tk.Label(middle_frame, text=label + ":", anchor="w", font=("Arial", 16, "bold")).grid(row=i, column=0, sticky="w", padx=5, pady=2)
-    stat_labels[label] = tk.Label(middle_frame, text="... PJ", relief="sunken", font=("Arial", 16))
+    tk.Label(middle_frame, text=label + ":", anchor="w", font=("Arial", 16, "bold"), bg="white", fg="black").grid(row=i, column=0, sticky="w", padx=5, pady=2)
+    stat_labels[label] = tk.Label(middle_frame, text="... PJ", relief="sunken", font=("Arial", 16), bg="white", fg="black")
     stat_labels[label].grid(row=i, column=1, padx=5, pady=2)
 
 # Kreisdiagramm
 fig, ax = plt.subplots(figsize=(5, 4))
 canvas = FigureCanvasTkAgg(fig, master=middle_frame)
-canvas.get_tk_widget().grid(row=0, column=2, rowspan=3, padx=20)
+canvas.get_tk_widget().grid(row=0, column=2, rowspan=3, padx=20, pady=10)
 
-# Label für keine Daten
-no_data_label = tk.Label(middle_frame, text="Keine Werte verfügbar", font=("Arial", 16), fg="red")
+# Label für "Keine Werte verfügbar"
+no_data_label = tk.Label(middle_frame, text="Keine Werte verfügbar", font=("Arial", 16), fg="red", bg="white")
 no_data_label.grid(row=3, column=2, pady=10)
 no_data_label.grid_remove()
 
-# Tabellen-Frame
-table_frame = tk.Frame(root, bd=1, relief="solid")
+# Table-Frame
+table_frame = tk.Frame(root, bg="white", bd=1, relief="solid")
 table_frame.pack(padx=10, pady=10)
 
-# Tabelle mit Stil
-style = ttk.Style()
+# Styles für die Tabelle
 style.configure("Treeview",
                 rowheight=25,
                 font=("Arial", 16),
@@ -99,7 +94,7 @@ style.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})])
 table = ttk.Treeview(table_frame, show="headings", height=10, style="Treeview")
 table.pack(padx=5, pady=5)
 
-# Daten laden
+# load data from CSV, JSON or DB
 def load_csv_or_json_or_db():
     global df
     try:
@@ -109,7 +104,7 @@ def load_csv_or_json_or_db():
             df = raw_df.fillna(0)
             df = df.set_index(raw_df.columns[0]).T.reset_index()
             df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
-            df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)  # Konvertiere "Jahr" zu int
+            df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
         elif selected_country == "Frankreich":
             raw_data = pd.read_json(file_path_fr)
             df = pd.DataFrame(raw_data).T.reset_index()
@@ -122,7 +117,7 @@ def load_csv_or_json_or_db():
             df = pd.read_sql_query(query, conn)
             conn.close()
             df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
-            df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)  # Konvertiere "Jahr" zu int
+            df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
         else:
             messagebox.showerror("Fehler", "Ungültige Länderauswahl.")
             return
@@ -131,7 +126,7 @@ def load_csv_or_json_or_db():
     except Exception as e:
         messagebox.showerror("Fehler beim Laden der Datei", str(e))
 
-# Dropdowns aktualisieren
+# update dropdown menus
 def update_dropdowns():
     try:
         energy_sources = [col for col in df.columns if col != "Jahr"]
@@ -146,7 +141,7 @@ def update_dropdowns():
     except Exception as e:
         messagebox.showerror("Fehler beim Aktualisieren der Dropdown-Menüs", str(e))
 
-# Kreisdiagramm aktualisieren
+# update pie chart
 def update_pie_chart():
     try:
         selected_year = year_var.get()
@@ -166,13 +161,13 @@ def update_pie_chart():
             wedges, texts = ax.pie([1], colors=["lightgrey"])
             ax.text(0, 0, "Keine Werte\nverfügbar", ha='center', va='center', fontsize=16, color="red")
         else:
-            explode = [0.01] * len(energy_data)  # Explodiere alle Segmente leicht für 3D-Effekt
+            explode = [0.01] * len(energy_data)
             ax.pie(
                 energy_data,
                 labels=energy_data.index,
                 autopct='%1.1f%%',
                 explode=explode,
-                shadow=True,  # Schatten für 3D-Effekt
+                shadow=True, 
                 startangle=90
             )
 
@@ -180,13 +175,12 @@ def update_pie_chart():
     except Exception as e:
         messagebox.showerror("Fehler beim Aktualisieren des Kreisdiagramms", str(e))
 
-# Daten anzeigen
+# Display data
 def display_data():
     selected_country = country_var.get()
     if not selected_country:
         messagebox.showerror("Fehler", "Bitte wählen Sie ein Land aus.")
         return
-
     try:
         table.delete(*table.get_children())
         table["columns"] = ["Jahr"] + list(df.columns[1:])
@@ -210,11 +204,10 @@ def display_data():
             stat_labels["Durchschn. Jahresverbrauch"].config(text=f"{mean_value:.2f} PJ")
             stat_labels["Minimaler Jahresverbrauch"].config(text=f"{min_value:.2f} PJ")
 
-        # Aktualisiere das Kreisdiagramm basierend auf dem ersten Jahr in der Dropdown-Liste
+        # Update Pie Chart based on selected year
         update_pie_chart()
     except Exception as e:
         messagebox.showerror("Fehler beim Anzeigen der Daten", str(e))
-
 
 # Footer-Frame
 footer_frame = tk.Frame(root, bg="lightgrey", height=30)
@@ -230,7 +223,7 @@ footer_label = tk.Label(
 )
 footer_label.pack(pady=5)
 
-# Start der Anwendung
+# Start Application
 country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien"]
 country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db())
 country_dropdown.current(0)
