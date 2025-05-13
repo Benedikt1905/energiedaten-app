@@ -190,9 +190,15 @@ def display_data():
             table.heading(col, text=col, anchor="center")
             table.column(col, anchor="center", width=170)
 
-        for _, row in df.iterrows():
+        # Zeilen abwechselnd grau und weiß einfärben
+        for i, (_, row) in enumerate(df.iterrows()):
             values = [row["Jahr"]] + list(row[1:])
-            table.insert("", "end", values=values)
+            tag = "even" if i % 2 == 0 else "odd"
+            table.insert("", "end", values=values, tags=(tag,))
+
+        # Tags für die Farben konfigurieren
+        table.tag_configure("even", background="white")
+        table.tag_configure("odd", background="lightgrey")
 
         selected_energy = energy_var.get()
         if selected_energy and selected_energy in df.columns:
