@@ -107,7 +107,12 @@ style.map("Treeview",
 style.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})])
 
 table = ttk.Treeview(table_frame, show="headings", height=10, style="Treeview")
-table.pack(padx=5, pady=5)
+table.pack(side="left", padx=5, pady=5, fill="both", expand=True)
+
+# Scrollbar hinzufügen
+scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
+scrollbar.pack(side="right", fill="y")
+table.configure(yscrollcommand=scrollbar.set)
 
 # load data from CSV, JSON, DB, or API
 def load_csv_or_json_or_db_or_api():
@@ -149,7 +154,7 @@ def load_csv_or_json_or_db_or_api():
 
             # Prüfung: Jahr-Spalte darf keinen Wert 0 enthalten
             if (df["Jahr"] == 0).any():
-                messagebox.showerror("Fehlercode 205", "Fehlerhafte Daten in der CSV Datei. In der Jahr-Spalte darf kein Wert 0 stehen. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                messagebox.showerror("Fehlercode 205", "Fehlerhafte Daten in der CSV Datei. In der Jahr-Spalte darf der Wert nicht 0 sein oder Sonderzeichen enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
                 return
 
             # Prüfung: Jahr muss mindestens 4-stellig sein
