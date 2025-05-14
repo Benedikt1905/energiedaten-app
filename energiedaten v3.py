@@ -7,6 +7,7 @@ import sqlite3
 import os
 import requests
 import chardet
+import re
 
 # main window with icon
 root = tk.Tk()
@@ -125,11 +126,17 @@ def load_csv_or_json_or_db_or_api():
                 messagebox.showerror("Fehler", f"Die Datei '{file_path_de}' konnte nicht mit dem erkannten Encoding '{detected_encoding}' gelesen werden.")
                 return
 
-            # Prüfung auf Kommazahlen (mit Punkt oder Komma)
+            # Prüfung auf Kommazahlen (mit Punkt oder Komma), Leerzeichen/Tabs und Sonderzeichen
             for col in raw_df.columns[1:]:
                 for val in raw_df[col].astype(str):
                     if ',' in val or '.' in val:
                         messagebox.showerror("Fehlercode 201", "Werte in der CSV Datei dürfen keine Kommazahlen sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        return
+                    if ' ' in val or '\t' in val:
+                        messagebox.showerror("Fehlercode 202", "Fehlerhafte Daten in der CSV Datei. Werte dürfen keine Leerzeichen oder TABS enthalten.")
+                        return
+                    if not re.fullmatch(r'\d+', val):
+                        messagebox.showerror("Fehlercode 203", "Fehlerhafte Daten in der CSV Datei. Werte dürfen keine Sonderzeichen enthalten.")
                         return
 
             df = raw_df.fillna(0)
@@ -285,7 +292,7 @@ footer_frame.pack(side="bottom", fill="x")
 # Text for footer
 footer_label = tk.Label(
     footer_frame,
-    text="2025 | made by Benedikt Krings | Version: 3.2.1",
+    text="2025 | made by Benedikt Krings | Version: 3.3.0",
     font=("Arial", 12),
     bg="lightgrey",
     fg="black"
