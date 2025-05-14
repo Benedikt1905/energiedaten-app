@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import sqlite3
 import os
+import requests
 
 # main window with icon
 root = tk.Tk()
@@ -17,10 +18,24 @@ if os.path.exists(icon_path):
 else:
     print(f"Icon-Datei '{icon_path}' nicht gefunden. Standard-Icon wird verwendet.")
 
+# Load logo image
+logo_path = os.path.join(base_path, "img/dbay-icon.png")
+if os.path.exists(logo_path):
+    logo_image = tk.PhotoImage(file=logo_path)
+else:
+    print(f"Logo-Datei '{logo_path}' nicht gefunden.")
+    logo_image = None
+
+# Display logo image in top frame
+if logo_image:
+    logo_label = tk.Label(root, image=logo_image, bg="white")
+    logo_label.place(relx=0.20, rely=-0.04)
+
 # path to data files
 file_path_de = r'data/Primärverbrauch DE.csv'
 file_path_fr = r'data/Primärverbrauch FR.json'
 file_path_gb = r'data/Primärverbrauch GB.db'
+api_url = "https://example.com/api/energydata"
 
 # global variables
 df = pd.DataFrame()
@@ -28,15 +43,13 @@ country_var = tk.StringVar()
 energy_var = tk.StringVar()
 year_var = tk.StringVar()
 
-# Top-Frame für Dropdown-Menüs
+# Top-Frame and styles for dropdown-menus
 top_frame = tk.Frame(root, bg="white")
 top_frame.pack(pady=10)
-
-# Styles für Dropdown-Menüs
 style = ttk.Style()
 style.configure("TCombobox", font=("Arial", 20), fieldbackground="white", background="white", foreground="black")
 
-# Dropdown-Menüs für Land, Energieträger und Jahr
+# dropdown menus for country, energy source and year
 tk.Label(top_frame, text="Land:", font=("Arial", 16), bg="white", fg="black").grid(row=0, column=0, padx=5, pady=5, sticky="w")
 country_dropdown = ttk.Combobox(top_frame, textvariable=country_var, state="readonly", style="TCombobox", font=("Arial", 16))
 country_dropdown.grid(row=0, column=1, padx=5, pady=5, sticky="w")
@@ -49,23 +62,23 @@ tk.Label(top_frame, text="Jahr:", font=("Arial", 16), bg="white", fg="black").gr
 year_dropdown = ttk.Combobox(top_frame, textvariable=year_var, state="readonly", style="TCombobox", font=("Arial", 16))
 year_dropdown.grid(row=2, column=1, padx=5, pady=5, sticky="w")
 
-# Middle-Frame für Statistik-Labels und Kreisdiagramm
+# middle frame for statistics and pie chart
 middle_frame = tk.Frame(root, bg="white")
 middle_frame.pack(pady=10)
 
-# Statistik-Labels
+# statistics labels
 stat_labels = {}
 for i, label in enumerate(["Maximaler Jahresverbrauch", "Durchschn. Jahresverbrauch", "Minimaler Jahresverbrauch"]):
     tk.Label(middle_frame, text=label + ":", anchor="w", font=("Arial", 16, "bold"), bg="white", fg="black").grid(row=i, column=0, sticky="w", padx=5, pady=2)
     stat_labels[label] = tk.Label(middle_frame, text="... PJ", relief="sunken", font=("Arial", 16), bg="white", fg="black")
     stat_labels[label].grid(row=i, column=1, padx=5, pady=2)
 
-# Kreisdiagramm
+# pie chart
 fig, ax = plt.subplots(figsize=(5, 4))
 canvas = FigureCanvasTkAgg(fig, master=middle_frame)
 canvas.get_tk_widget().grid(row=0, column=2, rowspan=3, padx=20, pady=10)
 
-# Label für "Keine Werte verfügbar"
+# label for "Keine Werte verfügbar"
 no_data_label = tk.Label(middle_frame, text="Keine Werte verfügbar", font=("Arial", 16), fg="red", bg="white")
 no_data_label.grid(row=3, column=2, pady=10)
 no_data_label.grid_remove()
@@ -74,7 +87,7 @@ no_data_label.grid_remove()
 table_frame = tk.Frame(root, bg="white", bd=1, relief="solid")
 table_frame.pack(padx=10, pady=10)
 
-# Styles für die Tabelle
+# styles for the table
 style.configure("Treeview",
                 rowheight=25,
                 font=("Arial", 16),
@@ -94,8 +107,8 @@ style.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})])
 table = ttk.Treeview(table_frame, show="headings", height=10, style="Treeview")
 table.pack(padx=5, pady=5)
 
-# load data from CSV, JSON or DB
-def load_csv_or_json_or_db():
+# load data from CSV, JSON, DB, or API
+def load_csv_or_json_or_db_or_api():
     global df
     try:
         selected_country = country_var.get()
@@ -118,6 +131,18 @@ def load_csv_or_json_or_db():
             conn.close()
             df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
             df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
+        elif selected_country == "API":
+            response = requests.get(api_url)
+            if response.status_code == 200:
+                raw_data = response.json()
+                df = pd.DataFrame(raw_data)
+                if "Jahr" not in df.columns:
+                    raise ValueError("Die API-Daten enthalten keine 'Jahr'-Spalte.")
+                df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
+                for col in df.columns[1:]:
+                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+            else:
+                raise ValueError(f"Fehler beim Abrufen der API-Daten: {response.status_code}")
         else:
             messagebox.showerror("Fehler", "Ungültige Länderauswahl.")
             return
@@ -154,7 +179,7 @@ def update_pie_chart():
             messagebox.showerror("Fehler", "Keine Daten für das ausgewählte Jahr verfügbar.")
             return
 
-        energy_data = selected_row.iloc[0, 1:]  # Alle Spalten außer "Jahr"
+        energy_data = selected_row.iloc[0, 1:]  # all columns except "Jahr"
         ax.clear()
 
         if energy_data.sum() == 0:
@@ -175,7 +200,28 @@ def update_pie_chart():
     except Exception as e:
         messagebox.showerror("Fehler beim Aktualisieren des Kreisdiagramms", str(e))
 
-# Display data
+# Funktion zum Sortieren der Tabelle
+def sort_table(column, reverse):
+    try:
+        if column == "Jahr" or column in df.columns[1:]:  # Nur "Jahr" und Energieträger sortierbar
+            sorted_df = df.sort_values(by=column, ascending=not reverse)
+            update_table(sorted_df)
+            table.heading(column, command=lambda: sort_table(column, not reverse))  # Sortierrichtung umkehren
+    except Exception as e:
+        messagebox.showerror("Fehler beim Sortieren der Tabelle", str(e))
+
+# Funktion zum Aktualisieren der Tabelle
+def update_table(dataframe):
+    try:
+        table.delete(*table.get_children())
+        for i, (_, row) in enumerate(dataframe.iterrows()):
+            values = [row["Jahr"]] + list(row[1:])
+            tag = "even" if i % 2 == 0 else "odd"
+            table.insert("", "end", values=values, tags=(tag,))
+    except Exception as e:
+        messagebox.showerror("Fehler beim Aktualisieren der Tabelle", str(e))
+
+# Aktualisierte Funktion zum Anzeigen der Daten
 def display_data():
     selected_country = country_var.get()
     if not selected_country:
@@ -187,16 +233,16 @@ def display_data():
         table.heading("#0", text="", anchor="center")
         table.column("#0", width=0, stretch=tk.NO)
         for col in table["columns"]:
-            table.heading(col, text=col, anchor="center")
+            table.heading(col, text=col, anchor="center", command=lambda c=col: sort_table(c, False))  # Sortierfunktion hinzufügen
             table.column(col, anchor="center", width=170)
 
-        # Zeilen abwechselnd grau und weiß einfärben
+        # Paint table line white and grey alternatively
         for i, (_, row) in enumerate(df.iterrows()):
             values = [row["Jahr"]] + list(row[1:])
             tag = "even" if i % 2 == 0 else "odd"
             table.insert("", "end", values=values, tags=(tag,))
 
-        # Tags für die Farben konfigurieren
+        # color tags
         table.tag_configure("even", background="white")
         table.tag_configure("odd", background="lightgrey")
 
@@ -219,20 +265,20 @@ def display_data():
 footer_frame = tk.Frame(root, bg="lightgrey", height=30)
 footer_frame.pack(side="bottom", fill="x")
 
-# Text für den Footer
+# Text for footer
 footer_label = tk.Label(
     footer_frame,
-    text="2025 | made by Benedikt Krings | Version: 3.1.1",
+    text="2025 | made by Benedikt Krings | Version: 3.2.1",
     font=("Arial", 12),
     bg="lightgrey",
     fg="black"
 )
 footer_label.pack(pady=5)
 
-# Start Application
-country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien"]
-country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db())
+# Start application
+country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "API"]
+country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_or_api())
 country_dropdown.current(0)
-load_csv_or_json_or_db()
+load_csv_or_json_or_db_or_api()
 root.mainloop()
 
