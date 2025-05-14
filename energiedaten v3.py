@@ -146,6 +146,9 @@ def load_csv_or_json_or_db_or_api():
                     if not re.fullmatch(r'\d+', val):
                         messagebox.showerror("Fehlercode 203", "Fehlerhafte Daten in der CSV Datei. Werte dürfen keine Sonderzeichen enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
                         return
+                    if len(val) > 6:
+                        messagebox.showerror("Fehlercode 210", "Fehlerhafte Daten in der CSV Datei. Werte dürfen nicht größer als 999999 sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        return
 
             df = raw_df.fillna(0)
             df = df.set_index(raw_df.columns[0]).T.reset_index()
