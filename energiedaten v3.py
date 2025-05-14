@@ -6,6 +6,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import sqlite3
 import os
 import requests
+import chardet
 
 # main window with icon
 root = tk.Tk()
@@ -113,7 +114,24 @@ def load_csv_or_json_or_db_or_api():
     try:
         selected_country = country_var.get()
         if selected_country == "Deutschland":
-            raw_df = pd.read_csv(file_path_de, sep=';', encoding='utf-8')
+            # Encoding automatisch erkennen
+            with open(file_path_de, 'rb') as f:
+                rawdata = f.read(4096)
+                result = chardet.detect(rawdata)
+                detected_encoding = result['encoding'] if result['encoding'] else 'utf-8'
+            try:
+                raw_df = pd.read_csv(file_path_de, sep=';', encoding=detected_encoding)
+            except UnicodeDecodeError:
+                messagebox.showerror("Fehler", f"Die Datei '{file_path_de}' konnte nicht mit dem erkannten Encoding '{detected_encoding}' gelesen werden.")
+                return
+
+            # Prüfung auf Kommazahlen (mit Punkt oder Komma)
+            for col in raw_df.columns[1:]:
+                for val in raw_df[col].astype(str):
+                    if ',' in val or '.' in val:
+                        messagebox.showerror("Fehlercode 201", "Werte in der CSV Datei dürfen keine Kommazahlen sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        return
+
             df = raw_df.fillna(0)
             df = df.set_index(raw_df.columns[0]).T.reset_index()
             df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
@@ -195,7 +213,6 @@ def update_pie_chart():
                 shadow=True, 
                 startangle=90
             )
-
         canvas.draw()
     except Exception as e:
         messagebox.showerror("Fehler beim Aktualisieren des Kreisdiagramms", str(e))
@@ -281,4 +298,3 @@ country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_o
 country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
 root.mainloop()
-
