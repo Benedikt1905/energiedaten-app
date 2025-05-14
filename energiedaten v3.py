@@ -130,10 +130,10 @@ def load_csv_or_json_or_db_or_api():
             for col in raw_df.columns[1:]:
                 for val in raw_df[col].astype(str):
                     if '-' in val:
-                        messagebox.showerror("Fehlercode 204", "Werte in der CSV Datei dürfen keine negativen Zahlen sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        messagebox.showerror("Fehlercode 204", "Fehlerhafte Daten in der CSV Datei. Werte in der CSV Datei dürfen keine negativen Zahlen sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
                         return
                     if ',' in val or '.' in val:
-                        messagebox.showerror("Fehlercode 201", "Werte in der CSV Datei dürfen keine Kommazahlen sein oder leer sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        messagebox.showerror("Fehlercode 201", "Fehlerhafte Daten in der CSV Datei. Werte in der CSV Datei dürfen keine Kommazahlen sein oder leer sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
                         return
                     if ' ' in val or '\t' in val:
                         messagebox.showerror("Fehlercode 202", "Fehlerhafte Daten in der CSV Datei. Werte dürfen keine Leerzeichen oder TABS enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
@@ -146,6 +146,34 @@ def load_csv_or_json_or_db_or_api():
             df = df.set_index(raw_df.columns[0]).T.reset_index()
             df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
             df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
+
+            # Prüfung: Jahr-Spalte darf keinen Wert 0 enthalten
+            if (df["Jahr"] == 0).any():
+                messagebox.showerror("Fehlercode 205", "Fehlerhafte Daten in der CSV Datei. In der Jahr-Spalte darf kein Wert 0 stehen. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                return
+
+            # Prüfung: Jahr muss mindestens 4-stellig sein
+            if any(df["Jahr"].apply(lambda x: len(str(x)) < 4)):
+                messagebox.showerror("Fehlercode 206", "Fehlerhafte Daten in der CSV Datei. Jeder Jahr-Wert muss mindestens 4-stellig sein (z.B. 1990).")
+                return
+
+            # Prüfung: Jahre müssen aufsteigend sortiert sein (jedes Jahr >= vorheriges und <= nächstes)
+            jahre = df["Jahr"].tolist()
+            for i in range(1, len(jahre)):
+                if jahre[i] < jahre[i-1]:
+                    messagebox.showerror("Fehlercode 207", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist kleiner als das vorherige Jahr {jahre[i-1]}. Die Jahre müssen aufsteigend sortiert sein.")
+                    return
+                if jahre[i] == jahre[i-1]:
+                    messagebox.showerror("Fehlercode 209", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
+                    return
+            for i in range(len(jahre)-1):
+                if jahre[i] > jahre[i+1]:
+                    messagebox.showerror("Fehlercode 208", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist größer als das nächste Jahr {jahre[i+1]}. Die Jahre müssen aufsteigend sortiert sein.")
+                    return
+                if jahre[i] == jahre[i+1]:
+                    messagebox.showerror("Fehlercode 209", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
+                    return
+
         elif selected_country == "Frankreich":
             raw_data = pd.read_json(file_path_fr)
             df = pd.DataFrame(raw_data).T.reset_index()
