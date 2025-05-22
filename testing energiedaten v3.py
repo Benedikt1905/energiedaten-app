@@ -37,7 +37,7 @@ if logo_image:
 file_path_de = r'data/Primärverbrauch DE.csv'
 file_path_fr = r'data/Primärverbrauch FR.json'
 file_path_gb = r'data/Primärverbrauch GB.db'
-api_url = "https://example.com/api/energydata"
+api_url = "http://localhost:8000/api/1/primary_energy_consumption"
 
 # global variables
 df = pd.DataFrame()
@@ -199,12 +199,19 @@ def load_csv_or_json_or_db_or_api():
             response = requests.get(api_url)
             if response.status_code == 200:
                 raw_data = response.json()
-                df = pd.DataFrame(raw_data)
-                if "Jahr" not in df.columns:
-                    raise ValueError("Die API-Daten enthalten keine 'Jahr'-Spalte.")
-                df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
-                for col in df.columns[1:]:
-                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+                # Die eigentlichen Daten liegen im "data"-Key und sind ein Dict: {jahr: {energieträger: wert, ...}, ...}
+                api_data = raw_data.get("data", {})
+                if not api_data:
+                    raise ValueError("Die API hat keine Daten geliefert.")
+                # In DataFrame umwandeln: Jahr als Spalte
+                df_api = pd.DataFrame.from_dict(api_data, orient="index")
+                df_api.index.name = "Jahr"
+                df_api.reset_index(inplace=True)
+                # Jahr in int umwandeln
+                df_api["Jahr"] = pd.to_numeric(df_api["Jahr"], errors='coerce').fillna(0).astype(int)
+                for col in df_api.columns[1:]:
+                    df_api[col] = pd.to_numeric(df_api[col], errors='coerce').fillna(0)
+                df = df_api
             else:
                 raise ValueError(f"Fehler beim Abrufen der API-Daten: {response.status_code}")
         else:
@@ -344,5 +351,3 @@ country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_o
 country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
 root.mainloop()
-
-
