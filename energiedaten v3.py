@@ -195,7 +195,7 @@ def load_csv_or_json_or_db_or_api():
             conn.close()
             df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
             df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
-        elif selected_country == "API":
+        elif selected_country == "Polen":
             response = requests.get(api_url)
             if response.status_code == 200:
                 raw_data = response.json()
@@ -346,7 +346,7 @@ footer_label = tk.Label(
 footer_label.pack(pady=5)
 
 # Start application
-country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "API"]
+country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "Polen"]
 country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_or_api())
 country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
