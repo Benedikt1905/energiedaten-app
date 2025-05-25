@@ -16,6 +16,21 @@ import os
 import requests
 import chardet
 import re
+import datetime
+
+def log_message(level, message):
+    log_path = os.path.join(base_path, "energiedaten-app.log")
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(log_path, "a", encoding="utf-8") as log_file:
+        log_file.write(f"[{now}] {level}: {message}\n")
+
+def log_and_show_error(title, message):
+    log_message("ERROR", f"{title}: {message}")
+    messagebox.showerror(title, message)
+
+def log_and_show_warning(title, message):
+    log_message("WARNING", f"{title}: {message}")
+    messagebox.showwarning(title, message)
 
 # main window with icon
 root = tk.Tk()
@@ -122,7 +137,7 @@ scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
 scrollbar.pack(side="right", fill="y")
 table.configure(yscrollcommand=scrollbar.set)
 
-# Funktion zum Überprüfen der CSV-Datei auf schädlichen Code
+# Funktion zum Überprüfen der CSV-Datei auf schädlichen Code gemäß des Sicherheitskonzepts des Auftraggebers ^^
 def check_csv_for_malicious_code(file_path):
     suspicious_patterns = [
         r"^=",  # Jede Formel am Zeilenanfang
@@ -136,14 +151,14 @@ def check_csv_for_malicious_code(file_path):
         r"\|", 
         r"\u202e",  # Unicode RTL-Override
         r"\u202d",  # Unicode LTR-Override
-        r"\u2066", r"\u2067", r"\u2068", r"\u202a", r"\u202b", r"\u202c", r"\u2069",  # weitere Unicode-Steuerzeichen bei Bedarf ergänzen
+        r"\u2066", r"\u2067", r"\u2068", r"\u202a", r"\u202b", r"\u202c", r"\u2069", #weitere Unicode-Steuerzeichen bei Bedarf ergänzen
     ]
     try:
         with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             for line_num, line in enumerate(f, 1):
                 # Prüfe auf Unicode-Tricks
                 if any(uc in line for uc in ['\u202e', '\u202d', '\u2066', '\u2067', '\u2068', '\u202a', '\u202b', '\u202c', '\u2069']):
-                    messagebox.showwarning(
+                    log_and_show_warning(
                         "Kritische Sicherheitswarnung!",
                         f"Die CSV-Datei enthält verdächtige Unicode-Steuerzeichen (z.B. RTL/LTR-Override) in Zeile {line_num}.\n"
                         f"Import wird abgebrochen."
@@ -151,7 +166,7 @@ def check_csv_for_malicious_code(file_path):
                     return False
                 for pattern in suspicious_patterns:
                     if re.search(pattern, line, re.IGNORECASE):
-                        messagebox.showwarning(
+                        log_and_show_warning(
                             "Kritische Sicherheitswarnung!",
                             f"Die CSV-Datei enthält potenziell schädlichen oder gefährlichen Code in Zeile {line_num}.\n"
                             f"Import wird abgebrochen.\nGefundener Ausdruck: {pattern}"
@@ -159,9 +174,9 @@ def check_csv_for_malicious_code(file_path):
                         return False
         return True
     except Exception as e:
-        messagebox.showerror("Bei der Sicherheitsprüfung ist ein Fehler aufgetreten! Bitte versuche es erneut", str(e))
+        log_and_show_error("Bei der Sicherheitsprüfung ist ein Fehler aufgetreten! Bitte versuche es erneut", str(e))
         return False
-
+    
 # load data from CSV, JSON, DB, or API
 def load_csv_or_json_or_db_or_api():
     global df
@@ -186,19 +201,19 @@ def load_csv_or_json_or_db_or_api():
             for col in raw_df.columns[1:]:
                 for val in raw_df[col].astype(str):
                     if '-' in val:
-                        messagebox.showerror("Fehlercode 204", "Fehlerhafte Daten in der CSV Datei. Werte in der CSV Datei dürfen keine negativen Zahlen sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        log_and_show_error("Fehlercode 204", "Fehlerhafte Daten in der CSV Datei. Werte in der CSV Datei dürfen keine negativen Zahlen sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
                         return
                     if ',' in val or '.' in val:
-                        messagebox.showerror("Fehlercode 201", "Fehlerhafte Daten in der CSV Datei. Werte in der CSV Datei dürfen keine Kommazahlen sein oder leer sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        log_and_show_error("Fehlercode 201", "Fehlerhafte Daten in der CSV Datei. Werte in der CSV Datei dürfen keine Kommazahlen sein oder leer sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
                         return
                     if ' ' in val or '\t' in val:
-                        messagebox.showerror("Fehlercode 202", "Fehlerhafte Daten in der CSV Datei. Werte dürfen keine Leerzeichen oder TABS enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        log_and_show_error("Fehlercode 202", "Fehlerhafte Daten in der CSV Datei. Werte dürfen keine Leerzeichen oder TABS enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
                         return
                     if not re.fullmatch(r'\d+', val):
-                        messagebox.showerror("Fehlercode 203", "Fehlerhafte Daten in der CSV Datei. Werte dürfen keine Sonderzeichen enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        log_and_show_error("Fehlercode 203", "Fehlerhafte Daten in der CSV Datei. Werte dürfen keine Sonderzeichen enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
                         return
                     if len(val) > 6:
-                        messagebox.showerror("Fehlercode 210", "Fehlerhafte Daten in der CSV Datei. Werte dürfen nicht größer als 999999 sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        log_and_show_error("Fehlercode 211", "Fehlerhafte Daten in der CSV Datei. Werte dürfen nicht größer als 999999 sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
                         return
 
             df = raw_df.fillna(0)
@@ -208,29 +223,29 @@ def load_csv_or_json_or_db_or_api():
 
             # Prüfung: Jahr-Spalte darf keinen Wert 0 enthalten
             if (df["Jahr"] == 0).any():
-                messagebox.showerror("Fehlercode 205", "Fehlerhafte Daten in der CSV Datei. In der Jahr-Spalte darf der Wert nicht 0 sein oder Sonderzeichen enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                log_and_show_error("Fehlercode 205", "Fehlerhafte Daten in der CSV Datei. In der Jahr-Spalte darf der Wert nicht 0 sein oder Sonderzeichen enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
                 return
 
             # Prüfung: Jahr muss mindestens 4-stellig sein
             if any(df["Jahr"].apply(lambda x: len(str(x)) < 4)):
-                messagebox.showerror("Fehlercode 206", "Fehlerhafte Daten in der CSV Datei. Jeder Jahr-Wert muss mindestens 4-stellig sein (z.B. 1990).")
+                log_and_show_error("Fehlercode 206", "Fehlerhafte Daten in der CSV Datei. Jeder Jahr-Wert muss mindestens 4-stellig sein (z.B. 1990).")
                 return
 
             # Prüfung: Jahre müssen aufsteigend sortiert sein (jedes Jahr >= vorheriges und <= nächstes)
             jahre = df["Jahr"].tolist()
             for i in range(1, len(jahre)):
                 if jahre[i] < jahre[i-1]:
-                    messagebox.showerror("Fehlercode 207", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist kleiner als das vorherige Jahr {jahre[i-1]}. Die Jahre müssen aufsteigend sortiert sein.")
+                    log_and_show_error("Fehlercode 207", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist kleiner als das vorherige Jahr {jahre[i-1]}. Die Jahre müssen aufsteigend sortiert sein.")
                     return
                 if jahre[i] == jahre[i-1]:
-                    messagebox.showerror("Fehlercode 209", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
+                    log_and_show_error("Fehlercode 208", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
                     return
             for i in range(len(jahre)-1):
                 if jahre[i] > jahre[i+1]:
-                    messagebox.showerror("Fehlercode 208", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist größer als das nächste Jahr {jahre[i+1]}. Die Jahre müssen aufsteigend sortiert sein.")
+                    log_and_show_error("Fehlercode 209", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist größer als das nächste Jahr {jahre[i+1]}. Die Jahre müssen aufsteigend sortiert sein.")
                     return
                 if jahre[i] == jahre[i+1]:
-                    messagebox.showerror("Fehlercode 209", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
+                    log_and_show_error("Fehlercode 210", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
                     return
 
         elif selected_country == "Frankreich":
@@ -266,12 +281,12 @@ def load_csv_or_json_or_db_or_api():
             else:
                 raise ValueError(f"Fehler beim Abrufen der API-Daten: {response.status_code}")
         else:
-            messagebox.showerror("Fehler", "Ungültige Länderauswahl.")
+            log_and_show_error("Fehler", "Ungültige Länderauswahl.")
             return
         update_dropdowns()
         display_data()
     except Exception as e:
-        messagebox.showerror("Fehler beim Laden der Datei", str(e))
+        log_and_show_error("Fehler beim Laden der Datei", str(e))
 
 # update dropdown menus
 def update_dropdowns():
@@ -286,19 +301,19 @@ def update_dropdowns():
         year_dropdown.current(0)
         year_dropdown.bind("<<ComboboxSelected>>", lambda e: update_pie_chart())
     except Exception as e:
-        messagebox.showerror("Fehler beim Aktualisieren der Dropdown-Menüs", str(e))
+        log_and_show_error("Fehler beim Aktualisieren der Dropdown-Menüs", str(e))
 
 # update pie chart
 def update_pie_chart():
     try:
         selected_year = year_var.get()
         if not selected_year:
-            messagebox.showerror("Fehler", "Bitte wählen Sie ein Jahr aus.")
+            messagebox.showinfo("Fehler", "Bitte wählen Sie ein Jahr aus.")
             return
 
         selected_row = df[df["Jahr"] == int(selected_year)]
         if selected_row.empty:
-            messagebox.showerror("Fehler", "Keine Daten für das ausgewählte Jahr verfügbar.")
+            log_and_show_error("Fehler", "Keine Daten für das ausgewählte Jahr verfügbar.")
             return
 
         energy_data = selected_row.iloc[0, 1:]  # all columns except "Jahr"
@@ -319,7 +334,7 @@ def update_pie_chart():
             )
         canvas.draw()
     except Exception as e:
-        messagebox.showerror("Fehler beim Aktualisieren des Kreisdiagramms", str(e))
+        log_and_show_error("Fehler beim Aktualisieren des Kreisdiagramms", str(e))
 
 # Funktion zum Sortieren der Tabelle
 def sort_table(column, reverse):
@@ -329,7 +344,7 @@ def sort_table(column, reverse):
             update_table(sorted_df)
             table.heading(column, command=lambda: sort_table(column, not reverse))  # Sortierrichtung umkehren
     except Exception as e:
-        messagebox.showerror("Fehler beim Sortieren der Tabelle", str(e))
+        log_and_show_error("Fehler beim Sortieren der Tabelle", str(e))
 
 # Funktion zum Aktualisieren der Tabelle
 def update_table(dataframe):
@@ -340,13 +355,13 @@ def update_table(dataframe):
             tag = "even" if i % 2 == 0 else "odd"
             table.insert("", "end", values=values, tags=(tag,))
     except Exception as e:
-        messagebox.showerror("Fehler beim Aktualisieren der Tabelle", str(e))
+        log_and_show_error("Fehler beim Aktualisieren der Tabelle", str(e))
 
 # Aktualisierte Funktion zum Anzeigen der Daten
 def display_data():
     selected_country = country_var.get()
     if not selected_country:
-        messagebox.showerror("Fehler", "Bitte wählen Sie ein Land aus.")
+        log_and_show_error("Fehler", "Bitte wählen Sie ein Land aus.")
         return
     try:
         table.delete(*table.get_children())
@@ -380,7 +395,7 @@ def display_data():
         # Update Pie Chart based on selected year
         update_pie_chart()
     except Exception as e:
-        messagebox.showerror("Fehler beim Anzeigen der Daten", str(e))
+        log_and_show_error("Fehler beim Anzeigen der Daten", str(e))
 
 # Footer-Frame
 footer_frame = tk.Frame(root, bg="lightgrey", height=30)
