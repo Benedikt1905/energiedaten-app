@@ -131,11 +131,12 @@ def check_csv_for_malicious_code(file_path):
         r"cmd", r"powershell", r"shell", r"WScript",
         r"WEBSERVICE", r"IMPORTXML", r"IMPORTDATA", r"IMPORTHTML", r"IMPORTRANGE", r"HYPERLINK",
         r"UNICHAR", r"CHAR", r"CONCATENATE", r"EXEC", r"OPEN", r"INCLUDE",
-        r"WMIC", r"-EX", r"CREATE",  # Weitere gefährliche Begriffe
-        r"\|",  # Pipe als Zeichen
+        r"WMIC", r"-EX", r"CREATE",  # Weitere gefährliche Begriffe ergänzen
+        r"DROP", r"DELETE", r"ALTER", r"INSERT", r"UPDATE",  # SQL-Injection
+        r"\|", 
         r"\u202e",  # Unicode RTL-Override
         r"\u202d",  # Unicode LTR-Override
-        r"\u2066", r"\u2067", r"\u2068", r"\u202a", r"\u202b", r"\u202c", r"\u2069",  # weitere Unicode-Steuerzeichen
+        r"\u2066", r"\u2067", r"\u2068", r"\u202a", r"\u202b", r"\u202c", r"\u2069",  # weitere Unicode-Steuerzeichen bei Bedarf ergänzen
     ]
     try:
         with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -143,7 +144,7 @@ def check_csv_for_malicious_code(file_path):
                 # Prüfe auf Unicode-Tricks
                 if any(uc in line for uc in ['\u202e', '\u202d', '\u2066', '\u2067', '\u2068', '\u202a', '\u202b', '\u202c', '\u2069']):
                     messagebox.showwarning(
-                        "Sicherheitswarnung!",
+                        "Kritische Sicherheitswarnung!",
                         f"Die CSV-Datei enthält verdächtige Unicode-Steuerzeichen (z.B. RTL/LTR-Override) in Zeile {line_num}.\n"
                         f"Import wird abgebrochen."
                     )
@@ -151,14 +152,14 @@ def check_csv_for_malicious_code(file_path):
                 for pattern in suspicious_patterns:
                     if re.search(pattern, line, re.IGNORECASE):
                         messagebox.showwarning(
-                            "Sicherheitswarnung!",
+                            "Kritische Sicherheitswarnung!",
                             f"Die CSV-Datei enthält potenziell schädlichen oder gefährlichen Code in Zeile {line_num}.\n"
                             f"Import wird abgebrochen.\nGefundener Ausdruck: {pattern}"
                         )
                         return False
         return True
     except Exception as e:
-        messagebox.showerror("Fehler bei der Sicherheitsprüfung", str(e))
+        messagebox.showerror("Bei der Sicherheitsprüfung ist ein Fehler aufgetreten! Bitte versuche es erneut", str(e))
         return False
 
 # load data from CSV, JSON, DB, or API
