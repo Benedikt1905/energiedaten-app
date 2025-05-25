@@ -19,7 +19,7 @@ import re
 import datetime
 
 def log_message(level, message):
-    log_path = os.path.join(base_path, "energiedaten-app.log")
+    log_path = os.path.join(base_path, "logs/energiedaten-app.log")
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(log_path, "a", encoding="utf-8") as log_file:
         log_file.write(f"[{now}] {level}: {message}\n")
@@ -404,7 +404,7 @@ footer_frame.pack(side="bottom", fill="x")
 # Text for footer
 footer_label = tk.Label(
     footer_frame,
-    text="©2025 | made by Benedikt Krings | Version: 2.2.0",
+    text="©2025 | made by Benedikt Krings | Version: 2.3.0",
     font=("Arial", 12),
     bg="lightgrey",
     fg="black"
