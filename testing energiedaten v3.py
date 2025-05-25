@@ -339,20 +339,6 @@ def display_data():
     except Exception as e:
         messagebox.showerror("Fehler beim Anzeigen der Daten", str(e))
 
-# Footer-Frame
-footer_frame = tk.Frame(root, bg="lightgrey", height=30)
-footer_frame.pack(side="bottom", fill="x")
-
-# Text for footer
-footer_label = tk.Label(
-    footer_frame,
-    text="2025 | made by Benedikt Krings | Version: 3.3.0",
-    font=("Arial", 12),
-    bg="lightgrey",
-    fg="black"
-)
-footer_label.pack(pady=5)
-
 # Start application
 country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "Polen"]
 country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_or_api())
