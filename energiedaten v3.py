@@ -3,7 +3,7 @@
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
 # Version: 2025052501                                                 #
-#          YYYYMMDD Change number                                     #
+#          YYYYMMDD Change Number                                     #
 #######################################################################
 
 import pandas as pd
@@ -155,7 +155,7 @@ def load_csv_or_json_or_db_or_api():
                         messagebox.showerror("Fehlercode 203", "Fehlerhafte Daten in der CSV Datei. Werte dürfen keine Sonderzeichen enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
                         return
                     if len(val) > 6:
-                        messagebox.showerror("Fehlercode 210", "Fehlerhafte Daten in der CSV Datei. Werte dürfen nicht größer als 999999 sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        messagebox.showerror("Fehlercode 211", "Fehlerhafte Daten in der CSV Datei. Werte dürfen nicht größer als 999999 sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
                         return
 
             df = raw_df.fillna(0)
@@ -180,14 +180,14 @@ def load_csv_or_json_or_db_or_api():
                     messagebox.showerror("Fehlercode 207", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist kleiner als das vorherige Jahr {jahre[i-1]}. Die Jahre müssen aufsteigend sortiert sein.")
                     return
                 if jahre[i] == jahre[i-1]:
-                    messagebox.showerror("Fehlercode 209", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
+                    messagebox.showerror("Fehlercode 208", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
                     return
             for i in range(len(jahre)-1):
                 if jahre[i] > jahre[i+1]:
-                    messagebox.showerror("Fehlercode 208", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist größer als das nächste Jahr {jahre[i+1]}. Die Jahre müssen aufsteigend sortiert sein.")
+                    messagebox.showerror("Fehlercode 209", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist größer als das nächste Jahr {jahre[i+1]}. Die Jahre müssen aufsteigend sortiert sein.")
                     return
                 if jahre[i] == jahre[i+1]:
-                    messagebox.showerror("Fehlercode 209", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
+                    messagebox.showerror("Fehlercode 210", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
                     return
 
         elif selected_country == "Frankreich":
@@ -346,7 +346,7 @@ footer_frame.pack(side="bottom", fill="x")
 # Text for footer
 footer_label = tk.Label(
     footer_frame,
-    text="2025 | made by Benedikt Krings | Version: 3.3.0",
+    text="2025 | made by Benedikt Krings | Version: 2.0.0",
     font=("Arial", 12),
     bg="lightgrey",
     fg="black"
