@@ -1,3 +1,11 @@
+#######################################################################
+# Author: Benedikt Krings                                             #
+# GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
+# GitHub Branch: main                                                 #
+# Version: 2025052501                                                 #
+#          YYYYMMDD Change number                                     #
+#######################################################################
+
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk, messagebox
