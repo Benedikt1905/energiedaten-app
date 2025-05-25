@@ -122,12 +122,37 @@ scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
 scrollbar.pack(side="right", fill="y")
 table.configure(yscrollcommand=scrollbar.set)
 
+# Funktion zum Überprüfen der CSV-Datei auf schädlichen Code
+def check_csv_for_malicious_code(file_path):
+    suspicious_patterns = [
+        r"^=cmd", r"^=powershell", r"^=shell", r"^=WScript", r"^=cmd\|", r"^=powershell\|", r"^=cmd\(", r"^=powershell\(",
+        r"@cmd", r"@powershell", r"@shell", r"@WScript", r"cmd\|", r"powershell\|"
+    ]
+    try:
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+            for line_num, line in enumerate(f, 1):
+                for pattern in suspicious_patterns:
+                    if re.search(pattern, line, re.IGNORECASE):
+                        messagebox.showwarning(
+                            "Sicherheitswarnung!",
+                            f"Die CSV-Datei enthält potenziell schädlichen Code in Zeile {line_num}.\n"
+                            f"Import wird abgebrochen.\nGefundener Ausdruck: {pattern}"
+                        )
+                        return False
+        return True
+    except Exception as e:
+        messagebox.showerror("Fehler bei der Sicherheitsprüfung", str(e))
+        return False
+    
 # load data from CSV, JSON, DB, or API
 def load_csv_or_json_or_db_or_api():
     global df
     try:
         selected_country = country_var.get()
         if selected_country == "Deutschland":
+            # Sicherheitsprüfung vor dem Einlesen!
+            if not check_csv_for_malicious_code(file_path_de):
+                return
             # Encoding automatisch erkennen
             with open(file_path_de, 'rb') as f:
                 rawdata = f.read(4096)
@@ -346,7 +371,7 @@ footer_frame.pack(side="bottom", fill="x")
 # Text for footer
 footer_label = tk.Label(
     footer_frame,
-    text="2025 | made by Benedikt Krings | Version: 2.1.1",
+    text="©2025 | made by Benedikt Krings | Version: 2.1.1",
     font=("Arial", 12),
     bg="lightgrey",
     fg="black"
