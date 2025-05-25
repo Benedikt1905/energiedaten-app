@@ -388,7 +388,7 @@ footer_frame.pack(side="bottom", fill="x")
 # Text for footer
 footer_label = tk.Label(
     footer_frame,
-    text="©2025 | made by Benedikt Krings | Version: 2.1.1",
+    text="©2025 | made by Benedikt Krings | Version: 2.2.0",
     font=("Arial", 12),
     bg="lightgrey",
     fg="black"
