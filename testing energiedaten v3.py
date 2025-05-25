@@ -19,7 +19,10 @@ import re
 import datetime
 
 def log_message(level, message):
-    log_path = os.path.join(base_path, "logs/energiedaten-app.log")
+    log_dir = os.path.join(base_path, "logs")
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    log_path = os.path.join(log_dir, "energiedaten-app.log")
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(log_path, "a", encoding="utf-8") as log_file:
         log_file.write(f"[{now}] {level}: {message}\n")
