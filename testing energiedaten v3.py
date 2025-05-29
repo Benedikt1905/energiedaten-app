@@ -135,49 +135,49 @@ style.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})])
 table = ttk.Treeview(table_frame, show="headings", height=10, style="Treeview")
 table.pack(side="left", padx=5, pady=5, fill="both", expand=True)
 
-# Scrollbar hinzufügen
+# Add scrollbar
 scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
 scrollbar.pack(side="right", fill="y")
 table.configure(yscrollcommand=scrollbar.set)
 
-# Funktion zum Überprüfen der CSV-Datei auf schädlichen Code gemäß des Sicherheitskonzepts des Auftraggebers ^^
+# Function to check the CSV file for malicious code according to the client's security concept ^^
 def check_csv_for_malicious_code(file_path):
     suspicious_patterns = [
-        r"^=",  # Jede Formel am Zeilenanfang
+        r"^=",  # Any formula at the beginning of a line
         r"@",
         r"^@",
         r"cmd", r"powershell", r"shell", r"WScript",
         r"WEBSERVICE", r"IMPORTXML", r"IMPORTDATA", r"IMPORTHTML", r"IMPORTRANGE", r"HYPERLINK",
         r"UNICHAR", r"CHAR", r"CONCATENATE", r"EXEC", r"OPEN", r"INCLUDE",
-        r"WMIC", r"-EX", r"CREATE",  # Weitere gefährliche Begriffe ergänzen
-        r"DROP", r"DELETE", r"ALTER", r"INSERT", r"UPDATE",  # SQL-Injection
+        r"WMIC", r"-EX", r"CREATE",  # Add more dangerous terms as needed
+        r"DROP", r"DELETE", r"ALTER", r"INSERT", r"UPDATE",  # SQL injection
         r"\|", 
         r"\u202e",  # Unicode RTL-Override
         r"\u202d",  # Unicode LTR-Override
-        r"\u2066", r"\u2067", r"\u2068", r"\u202a", r"\u202b", r"\u202c", r"\u2069", #weitere Unicode-Steuerzeichen bei Bedarf ergänzen
+        r"\u2066", r"\u2067", r"\u2068", r"\u202a", r"\u202b", r"\u202c", r"\u2069", # Add more Unicode control characters if needed
     ]
     try:
         with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             for line_num, line in enumerate(f, 1):
-                # Prüfe auf Unicode-Tricks
+                # Check for Unicode tricks
                 if any(uc in line for uc in ['\u202e', '\u202d', '\u2066', '\u2067', '\u2068', '\u202a', '\u202b', '\u202c', '\u2069']):
                     log_and_show_warning(
-                        "Kritische Sicherheitswarnung!",
-                        f"Die CSV-Datei enthält verdächtige Unicode-Steuerzeichen (z.B. RTL/LTR-Override) in Zeile {line_num}.\n"
-                        f"Import wird abgebrochen."
+                        "Critical Security Warning!",
+                        f"The CSV file contains suspicious Unicode control characters (e.g. RTL/LTR-Override) in line {line_num}.\n"
+                        f"Import will be aborted."
                     )
                     return False
                 for pattern in suspicious_patterns:
                     if re.search(pattern, line, re.IGNORECASE):
                         log_and_show_warning(
-                            "Kritische Sicherheitswarnung!",
-                            f"Die CSV-Datei enthält potenziell schädlichen oder gefährlichen Code in Zeile {line_num}.\n"
-                            f"Import wird abgebrochen.\nGefundener Ausdruck: {pattern}"
+                            "Critical Security Warning!",
+                            f"The CSV file contains potentially malicious or dangerous code in line {line_num}.\n"
+                            f"Import will be aborted.\nDetected pattern: {pattern}"
                         )
                         return False
         return True
     except Exception as e:
-        log_and_show_error("Bei der Sicherheitsprüfung ist ein Fehler aufgetreten! Bitte versuche es erneut", str(e))
+        log_and_show_error("An error occurred during the security check! Please try again.", str(e))
         return False
     
 # load data from CSV, JSON, DB, or API
@@ -185,11 +185,11 @@ def load_csv_or_json_or_db_or_api():
     global df
     try:
         selected_country = country_var.get()
-        if selected_country == "Deutschland":
-            # Sicherheitsprüfung vor dem Einlesen!
+        if selected_country == "Germany":
+            # Security check before reading!
             if not check_csv_for_malicious_code(file_path_de):
                 return
-            # Encoding automatisch erkennen
+            # Automatically detect encoding
             with open(file_path_de, 'rb') as f:
                 rawdata = f.read(4096)
                 result = chardet.detect(rawdata)
@@ -197,134 +197,134 @@ def load_csv_or_json_or_db_or_api():
             try:
                 raw_df = pd.read_csv(file_path_de, sep=';', encoding=detected_encoding)
             except UnicodeDecodeError:
-                messagebox.showerror("Fehler", f"Die Datei '{file_path_de}' konnte nicht mit dem erkannten Encoding '{detected_encoding}' gelesen werden.")
+                messagebox.showerror("Error", f"The file '{file_path_de}' could not be read with the detected encoding '{detected_encoding}'.")
                 return
 
-            # Prüfung auf Kommazahlen (mit Punkt oder Komma), Leerzeichen/Tabs, Sonderzeichen und negative Zahlen
+            # Check for decimal numbers (with dot or comma), spaces/tabs, special characters and negative numbers
             for col in raw_df.columns[1:]:
                 for val in raw_df[col].astype(str):
                     if '-' in val:
-                        log_and_show_error("Fehlercode 204", "Fehlerhafte Daten in der CSV Datei. Werte in der CSV Datei dürfen keine negativen Zahlen sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        log_and_show_error("Error code 204", "Invalid data in the CSV file. Values in the CSV file must not be negative numbers. Please check the data in the CSV file.")
                         return
                     if ',' in val or '.' in val:
-                        log_and_show_error("Fehlercode 201", "Fehlerhafte Daten in der CSV Datei. Werte in der CSV Datei dürfen keine Kommazahlen sein oder leer sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        log_and_show_error("Error code 201", "Invalid data in the CSV file. Values in the CSV file must not be decimal numbers or empty. Please check the data in the CSV file.")
                         return
                     if ' ' in val or '\t' in val:
-                        log_and_show_error("Fehlercode 202", "Fehlerhafte Daten in der CSV Datei. Werte dürfen keine Leerzeichen oder TABS enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        log_and_show_error("Error code 202", "Invalid data in the CSV file. Values must not contain spaces or TABS. Please check the data in the CSV file.")
                         return
                     if not re.fullmatch(r'\d+', val):
-                        log_and_show_error("Fehlercode 203", "Fehlerhafte Daten in der CSV Datei. Werte dürfen keine Sonderzeichen enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        log_and_show_error("Error code 203", "Invalid data in the CSV file. Values must not contain special characters. Please check the data in the CSV file.")
                         return
                     if len(val) > 6:
-                        log_and_show_error("Fehlercode 211", "Fehlerhafte Daten in der CSV Datei. Werte dürfen nicht größer als 999999 sein. Bitte überprüfen Sie die Daten in der CSV Datei.")
+                        log_and_show_error("Error code 211", "Invalid data in the CSV file. Values must not be greater than 999999. Please check the data in the CSV file.")
                         return
 
             df = raw_df.fillna(0)
             df = df.set_index(raw_df.columns[0]).T.reset_index()
-            df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
-            df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
+            df.rename(columns={df.columns[0]: "Year"}, inplace=True)
+            df["Year"] = pd.to_numeric(df["Year"], errors='coerce').fillna(0).astype(int)
 
-            # Prüfung: Jahr-Spalte darf keinen Wert 0 enthalten
-            if (df["Jahr"] == 0).any():
-                log_and_show_error("Fehlercode 205", "Fehlerhafte Daten in der CSV Datei. In der Jahr-Spalte darf der Wert nicht 0 sein oder Sonderzeichen enthalten. Bitte überprüfen Sie die Daten in der CSV Datei.")
+            # Check: Year column must not contain value 0
+            if (df["Year"] == 0).any():
+                log_and_show_error("Error code 205", "Invalid data in the CSV file. The year column must not contain the value 0 or special characters. Please check the data in the CSV file.")
                 return
 
-            # Prüfung: Jahr muss mindestens 4-stellig sein
-            if any(df["Jahr"].apply(lambda x: len(str(x)) < 4)):
-                log_and_show_error("Fehlercode 206", "Fehlerhafte Daten in der CSV Datei. Jeder Jahr-Wert muss mindestens 4-stellig sein (z.B. 1990).")
+            # Check: Year must be at least 4 digits
+            if any(df["Year"].apply(lambda x: len(str(x)) < 4)):
+                log_and_show_error("Error code 206", "Invalid data in the CSV file. Each year value must be at least 4 digits (e.g. 1990).")
                 return
 
-            # Prüfung: Jahre müssen aufsteigend sortiert sein (jedes Jahr >= vorheriges und <= nächstes)
-            jahre = df["Jahr"].tolist()
-            for i in range(1, len(jahre)):
-                if jahre[i] < jahre[i-1]:
-                    log_and_show_error("Fehlercode 207", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist kleiner als das vorherige Jahr {jahre[i-1]}. Die Jahre müssen aufsteigend sortiert sein.")
+            # Check: Years must be sorted in ascending order (each year >= previous and <= next)
+            years = df["Year"].tolist()
+            for i in range(1, len(years)):
+                if years[i] < years[i-1]:
+                    log_and_show_error("Error code 207", f"Invalid data in the CSV file. The year {years[i]} is less than the previous year {years[i-1]}. Years must be sorted in ascending order.")
                     return
-                if jahre[i] == jahre[i-1]:
-                    log_and_show_error("Fehlercode 208", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
+                if years[i] == years[i-1]:
+                    log_and_show_error("Error code 208", f"Invalid data in the CSV file. The year {years[i]} is duplicated. Each year value may only occur once.")
                     return
-            for i in range(len(jahre)-1):
-                if jahre[i] > jahre[i+1]:
-                    log_and_show_error("Fehlercode 209", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist größer als das nächste Jahr {jahre[i+1]}. Die Jahre müssen aufsteigend sortiert sein.")
+            for i in range(len(years)-1):
+                if years[i] > years[i+1]:
+                    log_and_show_error("Error code 209", f"Invalid data in the CSV file. The year {years[i]} is greater than the next year {years[i+1]}. Years must be sorted in ascending order.")
                     return
-                if jahre[i] == jahre[i+1]:
-                    log_and_show_error("Fehlercode 210", f"Fehlerhafte Daten in der CSV Datei. Das Jahr {jahre[i]} ist doppelt vorhanden. Jeder Jahr-Wert darf nur einmal vorkommen.")
+                if years[i] == years[i+1]:
+                    log_and_show_error("Error code 210", f"Invalid data in the CSV file. The year {years[i]} is duplicated. Each year value may only occur once.")
                     return
 
-        elif selected_country == "Frankreich":
+        elif selected_country == "France":
             raw_data = pd.read_json(file_path_fr)
             df = pd.DataFrame(raw_data).T.reset_index()
-            df.rename(columns={"index": "Jahr"}, inplace=True)
+            df.rename(columns={"index": "Year"}, inplace=True)
             for col in df.columns[1:]:
                 df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
-        elif selected_country == "Großbritannien":
+        elif selected_country == "United Kingdom":
             conn = sqlite3.connect(file_path_gb)
             query = "SELECT * FROM energieverbrauch ORDER BY Jahr"
             df = pd.read_sql_query(query, conn)
             conn.close()
-            df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
-            df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
-        elif selected_country == "Polen":
+            df.rename(columns={df.columns[0]: "Year"}, inplace=True)
+            df["Year"] = pd.to_numeric(df["Year"], errors='coerce').fillna(0).astype(int)
+        elif selected_country == "Poland":
             response = requests.get(api_url)
             if response.status_code == 200:
                 raw_data = response.json()
-                # Die eigentlichen Daten liegen im "data"-Key und sind ein Dict: {jahr: {energieträger: wert, ...}, ...}
+                # The actual data is in the "data" key and is a dict: {year: {energy_source: value, ...}, ...}
                 api_data = raw_data.get("data", {})
                 if not api_data:
-                    raise ValueError("Die API hat keine Daten geliefert.")
-                # In DataFrame umwandeln: Jahr als Spalte
+                    raise ValueError("The API did not return any data.")
+                # Convert to DataFrame: year as column
                 df_api = pd.DataFrame.from_dict(api_data, orient="index")
-                df_api.index.name = "Jahr"
+                df_api.index.name = "Year"
                 df_api.reset_index(inplace=True)
-                # Jahr in int umwandeln
-                df_api["Jahr"] = pd.to_numeric(df_api["Jahr"], errors='coerce').fillna(0).astype(int)
+                # Convert year to int
+                df_api["Year"] = pd.to_numeric(df_api["Year"], errors='coerce').fillna(0).astype(int)
                 for col in df_api.columns[1:]:
                     df_api[col] = pd.to_numeric(df_api[col], errors='coerce').fillna(0)
                 df = df_api
             else:
-                raise ValueError(f"Fehler beim Abrufen der API-Daten: {response.status_code}")
+                raise ValueError(f"Error retrieving API data: {response.status_code}")
         else:
-            log_and_show_error("Fehler", "Ungültige Länderauswahl.")
+            log_and_show_error("Error", "Invalid country selection.")
             return
         update_dropdowns()
         display_data()
     except Exception as e:
-        log_and_show_error("Fehler beim Laden der Datei", str(e))
+        log_and_show_error("Error loading file", str(e))
 
-# update dropdown menus
+# Update dropdown menus
 def update_dropdowns():
     try:
-        energy_sources = [col for col in df.columns if col != "Jahr"]
+        energy_sources = [col for col in df.columns if col != "Year"]
         energy_dropdown['values'] = energy_sources
         energy_dropdown.current(0)
         energy_dropdown.bind("<<ComboboxSelected>>", lambda e: display_data())
 
-        years = df["Jahr"].astype(str).tolist()
+        years = df["Year"].astype(str).tolist()
         year_dropdown['values'] = years
         year_dropdown.current(0)
         year_dropdown.bind("<<ComboboxSelected>>", lambda e: update_pie_chart())
     except Exception as e:
-        log_and_show_error("Fehler beim Aktualisieren der Dropdown-Menüs", str(e))
+        log_and_show_error("Error updating dropdown menus", str(e))
 
-# update pie chart
+# Update pie chart
 def update_pie_chart():
     try:
         selected_year = year_var.get()
         if not selected_year:
-            messagebox.showinfo("Fehler", "Bitte wählen Sie ein Jahr aus.")
+            messagebox.showinfo("Error", "Please select a year.")
             return
 
-        selected_row = df[df["Jahr"] == int(selected_year)]
+        selected_row = df[df["Year"] == int(selected_year)]
         if selected_row.empty:
-            log_and_show_error("Fehler", "Keine Daten für das ausgewählte Jahr verfügbar.")
+            log_and_show_error("Error", "No data available for the selected year.")
             return
-
-        energy_data = selected_row.iloc[0, 1:]  # all columns except "Jahr"
+        # all columns except "Year"
+        energy_data = selected_row.iloc[0, 1:]  
         ax.clear()
 
         if energy_data.sum() == 0:
             wedges, texts = ax.pie([1], colors=["lightgrey"])
-            ax.text(0, 0, "Keine Werte\nverfügbar", ha='center', va='center', fontsize=16, color="red")
+            ax.text(0, 0, "No values\navailable", ha='center', va='center', fontsize=16, color="red")
         else:
             explode = [0.01] * len(energy_data)
             ax.pie(
@@ -337,51 +337,51 @@ def update_pie_chart():
             )
         canvas.draw()
     except Exception as e:
-        log_and_show_error("Fehler beim Aktualisieren des Kreisdiagramms", str(e))
+        log_and_show_error("Error updating pie chart", str(e))
 
-# Funktion zum Sortieren der Tabelle
+# Function to sort the table
 def sort_table(column, reverse):
     try:
-        if column == "Jahr" or column in df.columns[1:]:  # Nur "Jahr" und Energieträger sortierbar
+        if column == "Year" or column in df.columns[1:]:
             sorted_df = df.sort_values(by=column, ascending=not reverse)
             update_table(sorted_df)
-            table.heading(column, command=lambda: sort_table(column, not reverse))  # Sortierrichtung umkehren
+            table.heading(column, command=lambda: sort_table(column, not reverse))
     except Exception as e:
-        log_and_show_error("Fehler beim Sortieren der Tabelle", str(e))
+        log_and_show_error("Error sorting table", str(e))
 
-# Funktion zum Aktualisieren der Tabelle
+# Function to update the table
 def update_table(dataframe):
     try:
         table.delete(*table.get_children())
         for i, (_, row) in enumerate(dataframe.iterrows()):
-            values = [row["Jahr"]] + list(row[1:])
+            values = [row["Year"]] + list(row[1:])
             tag = "even" if i % 2 == 0 else "odd"
             table.insert("", "end", values=values, tags=(tag,))
     except Exception as e:
-        log_and_show_error("Fehler beim Aktualisieren der Tabelle", str(e))
+        log_and_show_error("Error updating table", str(e))
 
-# Aktualisierte Funktion zum Anzeigen der Daten
+# Updated function to display the data
 def display_data():
     selected_country = country_var.get()
     if not selected_country:
-        log_and_show_error("Fehler", "Bitte wählen Sie ein Land aus.")
+        log_and_show_error("Error", "Please select a country.")
         return
     try:
         table.delete(*table.get_children())
-        table["columns"] = ["Jahr"] + list(df.columns[1:])
+        table["columns"] = ["Year"] + list(df.columns[1:])
         table.heading("#0", text="", anchor="center")
         table.column("#0", width=0, stretch=tk.NO)
+        # sort fumktion for each column
         for col in table["columns"]:
-            table.heading(col, text=col, anchor="center", command=lambda c=col: sort_table(c, False))  # Sortierfunktion hinzufügen
+            table.heading(col, text=col, anchor="center", command=lambda c=col: sort_table(c, False))
             table.column(col, anchor="center", width=170)
 
         # Paint table line white and grey alternatively
         for i, (_, row) in enumerate(df.iterrows()):
-            values = [row["Jahr"]] + list(row[1:])
+            values = [row["Year"]] + list(row[1:])
             tag = "even" if i % 2 == 0 else "odd"
             table.insert("", "end", values=values, tags=(tag,))
 
-        # color tags
         table.tag_configure("even", background="white")
         table.tag_configure("odd", background="lightgrey")
 
@@ -398,24 +398,10 @@ def display_data():
         # Update Pie Chart based on selected year
         update_pie_chart()
     except Exception as e:
-        log_and_show_error("Fehler beim Anzeigen der Daten", str(e))
-
-# Footer-Frame
-footer_frame = tk.Frame(root, bg="lightgrey", height=30)
-footer_frame.pack(side="bottom", fill="x")
-
-# Text for footer
-footer_label = tk.Label(
-    footer_frame,
-    text="©2025 | made by Benedikt Krings | Version: 2.3.0",
-    font=("Arial", 12),
-    bg="lightgrey",
-    fg="black"
-)
-footer_label.pack(pady=5)
+        log_and_show_error("Error displaying data", str(e))
 
 # Start application
-country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "Polen"]
+country_dropdown['values'] = ["Germany", "France", "United Kingdom", "Poland"]
 country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_or_api())
 country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
