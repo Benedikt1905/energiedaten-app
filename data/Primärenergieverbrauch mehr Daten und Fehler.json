@@ -1,0 +1,407 @@
+{
+  "1980": {
+    "Steinkohle": 1500,
+    "Braunkohle": 0,
+    "Mineralöle": 6600,
+    "Gase": 1800,
+    "Erneuerbare Energien": 300,
+    "Sonstige Energieträger": 200,
+    "Kernenergie": 8000
+  },
+  "1981": {
+    "Steinkohle": 1470,
+    "Braunkohle": 0,
+    "Mineralöle": 6540,
+    "Gase": 1860,
+    "Erneuerbare Energien": 330,
+    "Sonstige Energieträger": 210,
+    "Kernenergie": 8200
+  },
+  "1982": {
+    "Steinkohle": 1440,
+    "Braunkohle": 0,
+    "Mineralöle": 6480,
+    "Gase": 1920,
+    "Erneuerbare Energien": 360,
+    "Sonstige Energieträger": 220,
+    "Kernenergie": 8400
+  },
+  "1983": {
+    "Steinkohle": 1410,
+    "Braunkohle": 0,
+    "Mineralöle": 6420,
+    "Gase": 1980,
+    "Erneuerbare Energien": 390,
+    "Sonstige Energieträger": 230,
+    "Kernenergie": 8600
+  },
+  "1984": {
+    "Steinkohle": 1380,
+    "Braunkohle": 0,
+    "Mineralöle": 6360,
+    "Gase": 2040,
+    "Erneuerbare Energien": 420,
+    "Sonstige Energieträger": 240,
+    "Kernenergie": 8800
+  },
+  "1985": {
+    "Steinkohle": 1350,
+    "Braunkohle": 0,
+    "Mineralöle": 6300,
+    "Gase": 2100,
+    "Erneuerbare Energien": 450,
+    "Sonstige Energieträger": 250,
+    "Kernenergie": 9000
+  },
+  "1986": {
+    "Steinkohle": 1320,
+    "Braunkohle": 0,
+    "Mineralöle": 6240,
+    "Gase": 2160,
+    "Erneuerbare Energien": 480,
+    "Sonstige Energieträger": 260,
+    "Kernenergie": 9200
+  },
+  "1987": {
+    "Steinkohle": 1290,
+    "Braunkohle": 0,
+    "Mineralöle": 6180,
+    "Gase": 2220,
+    "Erneuerbare Energien": 510,
+    "Sonstige Energieträger": 270,
+    "Kernenergie": 9400
+  },
+  "1988": {
+    "Steinkohle": 1260,
+    "Braunkohle": 0,
+    "Mineralöle": 6120,
+    "Gase": 2280,
+    "Erneuerbare Energien": 540,
+    "Sonstige Energieträger": 280,
+    "Kernenergie": 9600
+  },
+  "1989": {
+    "Steinkohle": 1230,
+    "Braunkohle": 0,
+    "Mineralöle": 6060,
+    "Gase": 2340,
+    "Erneuerbare Energien": 570,
+    "Sonstige Energieträger": 290,
+    "Kernenergie": 9800
+  },
+  "1990": {
+    "Steinkohle": 1200,
+    "Braunkohle": 0,
+    "Mineralöle": 6000,
+    "Gase": 2400,
+    "Erneuerbare Energien": 600,
+    "Sonstige Energieträger": 300,
+    "Kernenergie": 9000
+  },
+  "1991": {
+    "Steinkohle": 1170,
+    "Braunkohle": 0,
+    "Mineralöle": 5940,
+    "Gase": 2460,
+    "Erneuerbare Energien": 630,
+    "Sonstige Energieträger": 310,
+    "Kernenergie": 9300
+  },
+  "1992": {
+    "Steinkohle": 1140,
+    "Braunkohle": 0,
+    "Mineralöle": 5880,
+    "Gase": 2520,
+    "Erneuerbare Energien": 660,
+    "Sonstige Energieträger": 320,
+    "Kernenergie": 9600
+  },
+  "1993": {
+    "Steinkohle": 1110,
+    "Braunkohle": 0,
+    "Mineralöle": 5820,
+    "Gase": 2580,
+    "Erneuerbare Energien": 690,
+    "Sonstige Energieträger": 330,
+    "Kernenergie": 9900
+  },
+  "1994": {
+    "Steinkohle": 1080,
+    "Braunkohle": 0,
+    "Mineralöle": 5760,
+    "Gase": 2640,
+    "Erneuerbare Energien": 720,
+    "Sonstige Energieträger": 340,
+    "Kernenergie": 10200
+  },
+  "1995": {
+    "Steinkohle": 1050,
+    "Braunkohle": 0,
+    "Mineralöle": 5700,
+    "Gase": 2700,
+    "Erneuerbare Energien": 750,
+    "Sonstige Energieträger": 350,
+    "Kernenergie": 10500
+  },
+  "1996": {
+    "Steinkohle": 1020,
+    "Braunkohle": 0,
+    "Mineralöle": 5640,
+    "Gase": 2760,
+    "Erneuerbare Energien": 780,
+    "Sonstige Energieträger": 360,
+    "Kernenergie": 10800
+  },
+  "1997": {
+    "Steinkohle": 990,
+    "Braunkohle": 0,
+    "Mineralöle": 5580,
+    "Gase": 2820,
+    "Erneuerbare Energien": 810,
+    "Sonstige Energieträger": 370,
+    "Kernenergie": 11100
+  },
+  "1998": {
+    "Steinkohle": 960,
+    "Braunkohle": 0,
+    "Mineralöle": 5520,
+    "Gase": 2880,
+    "Erneuerbare Energien": 840,
+    "Sonstige Energieträger": 380,
+    "Kernenergie": 11400
+  },
+  "1999": {
+    "Steinkohle": 930,
+    "Braunkohle": 0,
+    "Mineralöle": 5460,
+    "Gase": 2940,
+    "Erneuerbare Energien": 870,
+    "Sonstige Energieträger": 390,
+    "Kernenergie": 11700
+  },
+  "2000": {
+    "Steinkohle": 900,
+    "Braunkohle": 0,
+    "Mineralöle": 5400,
+    "Gase": 3000,
+    "Erneuerbare Energien": 900,
+    "Sonstige Energieträger": 400,
+    "Kernenergie": 12000
+  },
+  "2001": {
+    "Steinkohle": 870,
+    "Braunkohle": 0,
+    "Mineralöle": 5340,
+    "Gase": 3060,
+    "Erneuerbare Energien": "930",
+    "Sonstige Energieträger": 410,
+    "Kernenergie": 12250
+  },
+  "2002": {
+    "Steinkohle": 840,
+    "Braunkohle": 0,
+    "Mineralöle": 5280,
+    "Gase": 3120,
+    "Erneuerbare Energien": 960,
+    "Sonstige Energieträger": 420,
+    "Kernenergie": 12500
+  },
+  "2003": {
+    "Steinkohle": 810,
+    "Braunkohle": 0,
+    "Mineralöle": 5220,
+    "Gase": 3180,
+    "Erneuerbare Energien": 990,
+    "Sonstige Energieträger": 430,
+    "Kernenergie": 12750
+  },
+  "2004": {
+    "Steinkohle": 780,
+    "Braunkohle": 0,
+    "Mineralöle": 5160,
+    "Gase": 3240,
+    "Erneuerbare Energien": 1020,
+    "Sonstige Energieträger": 440,
+    "Kernenergie": 13000
+  },
+  "2005": {
+    "Steinkohle": 750,
+    "Braunkohle": 0,
+    "Mineralöle": 5100,
+    "Gase": 3300,
+    "Erneuerbare Energien": 1050,
+    "Sonstige Energieträger": 450,
+    "Kernenergie": 13250
+  },
+  "2006": {
+    "Steinkohle": 720,
+    "Braunkohle": 0,
+    "Mineralöle": 5040,
+    "Gase": 3360,
+    "Erneuerbare Energien": 1080,
+    "Sonstige Energieträger": 460,
+    "Kernenergie": 13500
+  },
+  "2007": {
+    "Steinkohle": 690,
+    "Braunkohle": 0,
+    "Mineralöle": 4980,
+    "Gase": 3420,
+    "Erneuerbare Energien": 1110,
+    "Sonstige Energieträger": 470,
+    "Kernenergie": 13750
+  },
+  "2008": {
+    "Steinkohle": 660,
+    "Braunkohle": 0,
+    "Mineralöle": 4920,
+    "Gase": 3480,
+    "Erneuerbare Energien": 1140,
+    "Sonstige Energieträger": 480,
+    "Kernenergie": 14000
+  },
+  "2009": {
+    "Steinkohle": 630,
+    "Braunkohle": 0,
+    "Mineralöle": 4860,
+    "Gase": 3540,
+    "Erneuerbare Energien": 1170,
+    "Sonstige Energieträger": 490,
+    "Kernenergie": 14250
+  },
+  "2010": {
+    "Steinkohle": 600,
+    "Braunkohle": 0,
+    "Mineralöle": 4800,
+    "Gase": 3600,
+    "Erneuerbare Energien": 1800,
+    "Sonstige Energieträger": 500,
+    "Kernenergie": 13500
+  },
+  "2011": {
+    "Steinkohle": 570,
+    "Braunkohle": 0,
+    "Mineralöle": 4740,
+    "Gase": 3660,
+    "Erneuerbare Energien": 1920,
+    "Sonstige Energieträger": 510,
+    "Kernenergie": 13200
+  },
+  "2012": {
+    "Steinkohle": 540,
+    "Braunkohle": 0,
+    "Mineralöle": 4680,
+    "Gase": 3720,
+    "Erneuerbare Energien": 2040,
+    "Sonstige Energieträger": 520,
+    "Kernenergie": 12900
+  },
+  "2013": {
+    "Steinkohle": 510,
+    "Braunkohle": 0,
+    "Mineralöle": 4620,
+    "Gase": 3780,
+    "Erneuerbare Energien": 2160,
+    "Sonstige Energieträger": 530,
+    "Kernenergie": 12600
+  },
+  "2014": {
+    "Steinkohle": 480,
+    "Braunkohle": 0,
+    "Mineralöle": 4560,
+    "Gase": 3840,
+    "Erneuerbare Energien": 2280,
+    "Sonstige Energieträger": 540,
+    "Kernenergie": 12300
+  },
+  "2015": {
+    "Steinkohle": 450,
+    "Braunkohle": 0,
+    "Mineralöle": 4500,
+    "Gase": 3900,
+    "Erneuerbare Energien": 2400,
+    "Sonstige Energieträger": 550,
+    "Kernenergie": 12000
+  },
+  "2016": {
+    "Steinkohle": 420,
+    "Braunkohle": 0,
+    "Mineralöle": 4440,
+    "Gase": 3960,
+    "Erneuerbare Energien": 2520,
+    "Sonstige Energieträger": 560,
+    "Kernenergie": 11700
+  },
+  "2017": {
+    "Steinkohle": 390,
+    "Braunkohle": 0,
+    "Mineralöle": 4380,
+    "Gase": 4020,
+    "Erneuerbare Energien": 2640,
+    "Sonstige Energieträger": 570,
+    "Kernenergie": 11400
+  },
+  "2018": {
+    "Steinkohle": 360,
+    "Braunkohle": 0,
+    "Mineralöle": 4320,
+    "Gase": 4080,
+    "Erneuerbare Energien": 2760,
+    "Sonstige Energieträger": 580,
+    "Kernenergie": 11100
+  },
+  "2019": {
+    "Steinkohle": 330,
+    "Braunkohle": 0,
+    "Mineralöle": 4260,
+    "Gase": 4140,
+    "Erneuerbare Energien": 2880,
+    "Sonstige Energieträger": 590,
+    "Kernenergie": 10800
+  },
+  "2020": {
+    "Steinkohle": 300,
+    "Braunkohle": 0,
+    "Mineralöle": 3600,
+    "Gase": 4200,
+    "Erneuerbare Energien": 3000,
+    "Sonstige Energieträger": 600,
+    "Kernenergie": 9000
+  },
+  "2021": {
+    "Steinkohle": 270,
+    "Braunkohle": 0,
+    "Mineralöle": 3450,
+    "Gase": 4050,
+    "Erneuerbare Energien": 3300,
+    "Sonstige Energieträger": 650,
+    "Kernenergie": 8250
+  },
+  "2022": {
+    "Steinkohle": 240,
+    "Braunkohle": 0,
+    "Mineralöle": 3300,
+    "Gase": 3900,
+    "Erneuerbare Energien": 3600,
+    "Sonstige Energieträger": 700,
+    "Kernenergie": 7500
+  },
+  "2023": {
+    "Steinkohle": 210,
+    "Braunkohle": 0,
+    "Mineralöle": 3150,
+    "Gase": 3750,
+    "Erneuerbare Energien": 3900,
+    "Sonstige Energieträger": 750,
+    "Kernenergie": 6750
+  },
+  "2024": {
+    "Steinkohle": 180,
+    "Braunkohle": 0,
+    "Mineralöle": 3000,
+    "Gase": 3600,
+    "Erneuerbare Energien": 4200,
+    "Sonstige Energieträger": 800,
+    "Kernenergie": 6000
+  }
+}
