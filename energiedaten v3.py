@@ -2,7 +2,7 @@
 # Author: Benedikt Krings                                             #
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
-# Version: 2025060404                                                 #
+# Version: 2025060405                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
 
@@ -60,7 +60,7 @@ if logo_image:
 
 # path to data files
 file_path_de = r'data/Primärverbrauch DE.csv'
-file_path_fr = r'data/Primärverbrauch FR.json'
+file_path_fr = r'data/Primärverbrauch mehr Daten und Fehler.json'
 file_path_gb = r'data/Primärverbrauch GB (mit Fehlern).db'
 api_url = "http://localhost:8000/api/1/primary_energy_consumption"
 
@@ -194,61 +194,37 @@ def load_csv_or_json_or_db_or_api():
                 result = chardet.detect(rawdata)
                 detected_encoding = result['encoding'] if result['encoding'] else 'utf-8'
             try:
-                raw_df = pd.read_csv(file_path_de, sep=';', encoding=detected_encoding)
+                raw_df = pd.read_csv(file_path_de, sep=';', encoding=detected_encoding, skip_blank_lines=True)
+                # Entferne komplett leere Zeilen (nur zur Sicherheit)
+                raw_df = raw_df.dropna(how='all')
             except UnicodeDecodeError:
                 messagebox.showerror("Error", f"The file '{file_path_de}' could not be read with the detected encoding '{detected_encoding}'.")
                 return
-
-            # Check for decimal numbers (with dot or comma), spaces/tabs, special characters and negative numbers
-            for col in raw_df.columns[1:]:
-                for val in raw_df[col].astype(str):
-                    if '-' in val:
-                        log_and_show_error("Error code 204", "Invalid data in the CSV file. Values in the CSV file must not be negative numbers. Please check the data in the CSV file. Check the logs.")
-                        return
-                    if ',' in val or '.' in val:
-                        log_and_show_error("Error code 201", "Invalid data in the CSV file. Values in the CSV file must not be decimal numbers or empty. Please check the data in the CSV file. Check the logs.")
-                        return
-                    if ' ' in val or '\t' in val:
-                        log_and_show_error("Error code 202", "Invalid data in the CSV file. Values must not contain spaces or TABS. Please check the data in the CSV file. Check the logs.")
-                        return
-                    if not re.fullmatch(r'\d+', val):
-                        log_and_show_error("Error code 203", "Invalid data in the CSV file. Values must not contain special characters. Please check the data in the CSV file. Check the logs.")
-                        return
-                    if len(val) > 6:
-                        log_and_show_error("Error code 211", "Invalid data in the CSV file. Values must not be greater than 999999. Please check the data in the CSV file. Check the logs.")
-                        return
 
             df = raw_df.fillna(0)
             df = df.set_index(raw_df.columns[0]).T.reset_index()
             df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
             df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
-
-            # Check: Year column must not contain value 0
-            if (df["Jahr"] == 0).any():
-                log_and_show_error("Error code 205", "Invalid data in the CSV file. The year column must not contain the value 0 or special characters. Please check the data in the CSV file. See the logs.")
-                return
-
-            # Check: Year must be at least 4 digits
-            if any(df["Jahr"].apply(lambda x: len(str(x)) < 4)):
-                log_and_show_error("Error code 206", "Invalid data in the CSV file. Each year value must be at least 4 digits (e.g. 1990). Check the logs.")
-                return
-
-            # Check: Years must be sorted in ascending order (each year >= previous and <= next)
+            # Alle Werte (außer Jahr) auf ganze Zahlen runden
+            for col in df.columns:
+                if col != "Jahr":
+                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
+            # Jahre prüfen und ggf. sortieren
             years = df["Jahr"].tolist()
-            for i in range(1, len(years)):
-                if years[i] < years[i-1]:
-                    log_and_show_error("Error code 207", f"Invalid data in the CSV file. The year {years[i]} is less than the previous year {years[i-1]}. Years must be sorted in ascending order. Check ths logs.")
-                    return
-                if years[i] == years[i-1]:
-                    log_and_show_error("Error code 208", f"Invalid data in the CSV file. The year {years[i]} is duplicated. Each year value may only occur once.Ceck the logs.")
-                    return
-            for i in range(len(years)-1):
-                if years[i] > years[i+1]:
-                    log_and_show_error("Error code 209", f"Invalid data in the CSV file. The year {years[i]} is greater than the next year {years[i+1]}. Years must be sorted in ascending order. Check the logs.")
-                    return
-                if years[i] == years[i+1]:
-                    log_and_show_error("Error code 210", f"Invalid data in the CSV file. The year {years[i]} is duplicated. Each year value may only occur once. Check the logs")
-                    return
+            years_sorted = sorted(years)
+            if years != years_sorted:
+                log_and_show_warning(
+                    "Warnung: Jahre nicht sortiert",
+                    "Die Jahre in der CSV-Datei sind nicht aufsteigend sortiert. Die Daten werden trotzdem verwendet und die Jahre werden automatisch sortiert."
+                )
+                df = df.sort_values(by="Jahr").reset_index(drop=True)
+                years = df["Jahr"].tolist()
+            # Prüfe auf doppelte Jahre nach dem Sortieren
+            if len(years) != len(set(years)):
+                log_and_show_warning(
+                    "Warnung: Doppelte Jahre",
+                    "Die CSV-Datei enthält doppelte Jahre. Die Daten werden trotzdem verwendet, aber doppelte Jahre können zu fehlerhaften Auswertungen führen."
+                )
         elif selected_country == "Frankreich":
             raw_data = pd.read_json(file_path_fr)
             df = pd.DataFrame(raw_data).T.reset_index()
@@ -424,4 +400,3 @@ country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_o
 country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
 root.mainloop()
-
