@@ -2,7 +2,7 @@
 # Author: Benedikt Krings                                             #
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
-# Version: 2025060402                                                 #
+# Version: 2025060403                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
 
@@ -184,7 +184,7 @@ def load_csv_or_json_or_db_or_api():
     global df
     try:
         selected_country = country_var.get()
-        if selected_country == "Germany":
+        if selected_country == "Deutschland":
             # Security check before reading!
             if not check_csv_for_malicious_code(file_path_de):
                 return
@@ -220,21 +220,21 @@ def load_csv_or_json_or_db_or_api():
 
             df = raw_df.fillna(0)
             df = df.set_index(raw_df.columns[0]).T.reset_index()
-            df.rename(columns={df.columns[0]: "Year"}, inplace=True)
-            df["Year"] = pd.to_numeric(df["Year"], errors='coerce').fillna(0).astype(int)
+            df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
+            df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
 
             # Check: Year column must not contain value 0
-            if (df["Year"] == 0).any():
+            if (df["Jahr"] == 0).any():
                 log_and_show_error("Error code 205", "Invalid data in the CSV file. The year column must not contain the value 0 or special characters. Please check the data in the CSV file. See the logs.")
                 return
 
             # Check: Year must be at least 4 digits
-            if any(df["Year"].apply(lambda x: len(str(x)) < 4)):
+            if any(df["Jahr"].apply(lambda x: len(str(x)) < 4)):
                 log_and_show_error("Error code 206", "Invalid data in the CSV file. Each year value must be at least 4 digits (e.g. 1990). Check the logs.")
                 return
 
             # Check: Years must be sorted in ascending order (each year >= previous and <= next)
-            years = df["Year"].tolist()
+            years = df["Jahr"].tolist()
             for i in range(1, len(years)):
                 if years[i] < years[i-1]:
                     log_and_show_error("Error code 207", f"Invalid data in the CSV file. The year {years[i]} is less than the previous year {years[i-1]}. Years must be sorted in ascending order. Check ths logs.")
@@ -249,20 +249,20 @@ def load_csv_or_json_or_db_or_api():
                 if years[i] == years[i+1]:
                     log_and_show_error("Error code 210", f"Invalid data in the CSV file. The year {years[i]} is duplicated. Each year value may only occur once. Check the logs")
                     return
-        elif selected_country == "France":
+        elif selected_country == "Frankreich":
             raw_data = pd.read_json(file_path_fr)
             df = pd.DataFrame(raw_data).T.reset_index()
-            df.rename(columns={"index": "Year"}, inplace=True)
+            df.rename(columns={"index": "Jahr"}, inplace=True)
             for col in df.columns[1:]:
                 df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
-        elif selected_country == "United Kingdom":
+        elif selected_country == "Großbritannien":
             conn = sqlite3.connect(file_path_gb)
             query = "SELECT * FROM energieverbrauch ORDER BY Jahr"
             df = pd.read_sql_query(query, conn)
             conn.close()
-            df.rename(columns={df.columns[0]: "Year"}, inplace=True)
-            df["Year"] = pd.to_numeric(df["Year"], errors='coerce').fillna(0).astype(int)
-        elif selected_country == "Poland":
+            df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
+            df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
+        elif selected_country == "Polen":
             response = requests.get(api_url)
             if response.status_code == 200:
                 raw_data = response.json()
@@ -272,10 +272,10 @@ def load_csv_or_json_or_db_or_api():
                     raise ValueError("The API did not return any data.")
                 # Convert to DataFrame: year as column
                 df_api = pd.DataFrame.from_dict(api_data, orient="index")
-                df_api.index.name = "Year"
+                df_api.index.name = "Jahr"
                 df_api.reset_index(inplace=True)
                 # Convert year to int
-                df_api["Year"] = pd.to_numeric(df_api["Year"], errors='coerce').fillna(0).astype(int)
+                df_api["Jahr"] = pd.to_numeric(df_api["Jahr"], errors='coerce').fillna(0).astype(int)
                 for col in df_api.columns[1:]:
                     df_api[col] = pd.to_numeric(df_api[col], errors='coerce').fillna(0)
                 df = df_api
@@ -292,12 +292,12 @@ def load_csv_or_json_or_db_or_api():
 # Update dropdown menus
 def update_dropdowns():
     try:
-        energy_sources = [col for col in df.columns if col != "Year"]
+        energy_sources = [col for col in df.columns if col != "Jahr"]
         energy_dropdown['values'] = energy_sources
         energy_dropdown.current(0)
         energy_dropdown.bind("<<ComboboxSelected>>", lambda e: display_data())
 
-        years = df["Year"].astype(str).tolist()
+        years = df["Jahr"].astype(str).tolist()
         year_dropdown['values'] = years
         year_dropdown.current(0)
         year_dropdown.bind("<<ComboboxSelected>>", lambda e: update_pie_chart())
@@ -312,7 +312,7 @@ def update_pie_chart():
             messagebox.showinfo("Error", "Please select a year.")
             return
 
-        selected_row = df[df["Year"] == int(selected_year)]
+        selected_row = df[df["Jahr"] == int(selected_year)]
         if selected_row.empty:
             log_and_show_error("Error", "No data available for the selected year. Chekc the logs.")
             return
@@ -340,7 +340,7 @@ def update_pie_chart():
 # Function to sort the table
 def sort_table(column, reverse):
     try:
-        if column == "Year" or column in df.columns[1:]:
+        if column == "Jahr" or column in df.columns[1:]:
             sorted_df = df.sort_values(by=column, ascending=not reverse)
             update_table(sorted_df)
             table.heading(column, command=lambda: sort_table(column, not reverse))
@@ -352,7 +352,7 @@ def update_table(dataframe):
     try:
         table.delete(*table.get_children())
         for i, (_, row) in enumerate(dataframe.iterrows()):
-            values = [row["Year"]] + list(row[1:])
+            values = [row["Jahr"]] + list(row[1:])
             tag = "even" if i % 2 == 0 else "odd"
             table.insert("", "end", values=values, tags=(tag,))
     except Exception as e:
@@ -366,7 +366,7 @@ def display_data():
         return
     try:
         table.delete(*table.get_children())
-        table["columns"] = ["Year"] + list(df.columns[1:])
+        table["columns"] = ["Jahr"] + list(df.columns[1:])
         table.heading("#0", text="", anchor="center")
         table.column("#0", width=0, stretch=tk.NO)
         # sort fumktion for each column
@@ -376,7 +376,7 @@ def display_data():
 
         # Paint table line white and grey alternatively
         for i, (_, row) in enumerate(df.iterrows()):
-            values = [row["Year"]] + list(row[1:])
+            values = [row["Jahr"]] + list(row[1:])
             tag = "even" if i % 2 == 0 else "odd"
             table.insert("", "end", values=values, tags=(tag,))
 
@@ -399,9 +399,8 @@ def display_data():
         log_and_show_error("Error displaying data", str(e), "Check the logs")
 
 # Start application
-country_dropdown['values'] = ["Germany", "France", "United Kingdom", "Poland"]
+country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "Polen"]
 country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_or_api())
 country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
 root.mainloop()
-
