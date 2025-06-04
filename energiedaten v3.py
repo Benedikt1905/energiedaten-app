@@ -2,7 +2,7 @@
 # Author: Benedikt Krings                                             #
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
-# Version: 2025060403                                                 #
+# Version: 2025060404                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
 
@@ -37,7 +37,7 @@ def log_and_show_warning(title, message):
 
 # main window with icon
 root = tk.Tk()
-root.title("Primärenergieverbrauch")
+root.title("Primärenergieverbrauch v2.5")
 root.config(bg="white")
 base_path = os.path.dirname(os.path.abspath(__file__))
 icon_path = os.path.join(base_path, "img/dbay-icon.ico")
@@ -61,7 +61,7 @@ if logo_image:
 # path to data files
 file_path_de = r'data/Primärverbrauch DE.csv'
 file_path_fr = r'data/Primärverbrauch FR.json'
-file_path_gb = r'data/Primärverbrauch GB.db'
+file_path_gb = r'data/Primärverbrauch GB (mit Fehlern).db'
 api_url = "http://localhost:8000/api/1/primary_energy_consumption"
 
 # global variables
@@ -257,11 +257,31 @@ def load_csv_or_json_or_db_or_api():
                 df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
         elif selected_country == "Großbritannien":
             conn = sqlite3.connect(file_path_gb)
-            query = "SELECT * FROM energieverbrauch ORDER BY Jahr"
+            query = "SELECT * FROM energieverbrauch"
             df = pd.read_sql_query(query, conn)
             conn.close()
             df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
             df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
+            # Alle Werte (außer Jahr) auf ganze Zahlen runden
+            for col in df.columns:
+                if col != "Jahr":
+                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
+            # Jahre prüfen und ggf. sortieren
+            years = df["Jahr"].tolist()
+            years_sorted = sorted(years)
+            if years != years_sorted:
+                log_and_show_warning(
+                    "Warnung: Jahre nicht sortiert",
+                    "Die Jahre in der Datenbank sind nicht aufsteigend sortiert. Die Daten werden trotzdem verwendet und die Jahre werden automatisch sortiert."
+                )
+                df = df.sort_values(by="Jahr").reset_index(drop=True)
+                years = df["Jahr"].tolist()
+            # Prüfe auf doppelte Jahre nach dem Sortieren
+            if len(years) != len(set(years)):
+                log_and_show_warning(
+                    "Warnung: Doppelte Jahre",
+                    "Die Datenbank enthält doppelte Jahre. Die Daten werden trotzdem verwendet, aber doppelte Jahre können zu fehlerhaften Auswertungen führen."
+                )
         elif selected_country == "Polen":
             response = requests.get(api_url)
             if response.status_code == 200:
@@ -404,3 +424,4 @@ country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_o
 country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
 root.mainloop()
+
