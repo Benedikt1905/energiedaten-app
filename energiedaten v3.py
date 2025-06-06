@@ -65,7 +65,7 @@ if os.path.exists(icon_path):
     root.iconbitmap(icon_path)
 else:
     show_warning("Warning", "Default icon is actually used.")
-    log_error(f"Icon-Datei unter'{icon_path}' nicht gefunden. Standard-Icon wird verwendet.")
+    log_warning(f"Icon image not found in'{icon_path}'. Default icon in use. Please check if the path and image exists.")
 
 # logo image in GUI
 logo_path = os.path.join(base_path, "img/dbay-icon.png")
