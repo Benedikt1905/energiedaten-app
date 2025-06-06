@@ -183,22 +183,25 @@ def check_csv_for_malicious_code(file_path):
         with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             for line_num, line in enumerate(f, 1):
                 if any(uc in line for uc in ['\u202e', '\u202d', '\u2066', '\u2067', '\u2068', '\u202a', '\u202b', '\u202c', '\u2069']):
+                    log_warning(f"Suspicious Unicode control characters found in line {line_num} of '{file_path}'.")
                     show_warning(
                         "Critical Security Warning!",
-                        f"The CSV file contains suspicious Unicode control characters (e.g. RTL/LTR-Override) in line {line_num}.\n"
+                        f"The CSV file contains suspicious Unicode control characters (e.g. RTL/LTR-Override).\n"
                         f"Import will be aborted. Check the logs."
                     )
                     return False
                 for pattern in suspicious_patterns:
                     if re.search(pattern, line, re.IGNORECASE):
+                        log_warning(f"Suspicious pattern '{pattern}' found in line {line_num} of '{file_path}'.")
                         show_warning(
                             "Critical Security Warning!",
-                            f"The CSV file contains potentially malicious or dangerous code in line {line_num}.\n"
+                            f"The CSV file contains potentially malicious or dangerous code.\n"
                             f"Import will be aborted.\nDetected pattern: {pattern} Check the logs."
                         )
                         return False
         return True
     except Exception as e:
+        log_error(f"Critical error during security check of '{file_path}': {str(e)}")
         show_error("An error occurred during the security check! Please try again. Check the logs", str(e) )
         return False
     
@@ -221,33 +224,13 @@ def load_csv_or_json_or_db_or_api():
                 # Entferne komplett leere Zeilen (nur zur Sicherheit)
                 raw_df = raw_df.dropna(how='all')
             except UnicodeDecodeError:
-                messagebox.showerror("Error", f"The file '{file_path_de}' could not be read with the detected encoding '{detected_encoding}'.")
+                log_error(f"The file '{file_path_de}' could not be read with the detected encoding '{detected_encoding}'.")
+                show_error("Error", "The file could not be read with the detected encoding. Check the logs for more details.")
                 return
-
             df = raw_df.fillna(0)
             df = df.set_index(raw_df.columns[0]).T.reset_index()
             df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
             df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
-            # Alle Werte (außer Jahr) auf ganze Zahlen runden
-            for col in df.columns:
-                if col != "Jahr":
-                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
-            # Jahre prüfen und ggf. sortieren
-            years = df["Jahr"].tolist()
-            years_sorted = sorted(years)
-            if years != years_sorted:
-                show_warning(
-                    "Warnung: Jahre nicht sortiert",
-                    "Die Jahre in der CSV-Datei sind nicht aufsteigend sortiert. Die Daten werden trotzdem verwendet und die Jahre werden automatisch sortiert."
-                )
-                df = df.sort_values(by="Jahr").reset_index(drop=True)
-                years = df["Jahr"].tolist()
-            # Prüfe auf doppelte Jahre nach dem Sortieren
-            if len(years) != len(set(years)):
-                show_warning(
-                    "Warnung: Doppelte Jahre",
-                    "Die CSV-Datei enthält doppelte Jahre. Die Daten werden trotzdem verwendet, aber doppelte Jahre können zu fehlerhaften Auswertungen führen."
-                )
         elif selected_country == "Frankreich":
             raw_data = pd.read_json(file_path_fr)
             df = pd.DataFrame(raw_data).T.reset_index()
@@ -261,7 +244,7 @@ def load_csv_or_json_or_db_or_api():
             conn.close()
             df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
             df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
-            # Alle Werte (außer Jahr) auf ganze Zahlen runden
+             # Alle Werte (außer Jahr) auf ganze Zahlen runden
             for col in df.columns:
                 if col != "Jahr":
                     df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
@@ -269,17 +252,19 @@ def load_csv_or_json_or_db_or_api():
             years = df["Jahr"].tolist()
             years_sorted = sorted(years)
             if years != years_sorted:
+                log_warning("The years have not been sorted in ascending order. The data will be used anyway and the years will be showed correctly anyways.")
                 show_warning(
                     "Warnung: Jahre nicht sortiert",
-                    "Die Jahre in der Datenbank sind nicht aufsteigend sortiert. Die Daten werden trotzdem verwendet und die Jahre werden automatisch sortiert."
+                    "Die Jahre in der CSV-Datei sind nicht aufsteigend sortiert. Die Daten werden trotzdem verwendet und die Jahre werden automatisch sortiert."
                 )
                 df = df.sort_values(by="Jahr").reset_index(drop=True)
                 years = df["Jahr"].tolist()
             # Prüfe auf doppelte Jahre nach dem Sortieren
             if len(years) != len(set(years)):
+                log_warning("The CSV file contains duplicate years. The data will be used anyway, but duplicate years can lead to incorrect evaluations.")
                 show_warning(
                     "Warnung: Doppelte Jahre",
-                    "Die Datenbank enthält doppelte Jahre. Die Daten werden trotzdem verwendet, aber doppelte Jahre können zu fehlerhaften Auswertungen führen."
+                    "Die CSV-Datei enthält doppelte Jahre. Die Daten werden trotzdem verwendet, aber doppelte Jahre können zu fehlerhaften Auswertungen führen."
                 )
         elif selected_country == "Polen":
             response = requests.get(api_url)
