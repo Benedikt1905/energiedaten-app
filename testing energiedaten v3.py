@@ -2,7 +2,7 @@
 # Author: Benedikt Krings                                             #
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
-# Version: 2025060604                                                 #
+# Version: 2025060608                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
 
@@ -18,6 +18,13 @@ import chardet
 import re
 import datetime
 
+# path to data files
+file_path_de = r'data/Primärverbrauch DE.csv'
+file_path_fr = r'data/Primärverbrauch mehr Daten und Fehler.json'
+file_path_gb = r'data/Primärverbrauch GB (mit Fehlern).db'
+api_url = "http://localhost:8000/api/1/primary_energy_consumption"
+
+# Function to log messages to a file
 def log_message(level, message):
     log_dir = os.path.join(base_path, "logs")
     if not os.path.exists(log_dir):
@@ -80,12 +87,6 @@ else:
 if logo_image:
     logo_label = tk.Label(root, image=logo_image, bg="white")
     logo_label.place(relx=0.20, rely=-0.04)
-
-# path to data files
-file_path_de = r'data/Primärverbrauch DE.csv'
-file_path_fr = r'data/Primärverbrauch mehr Daten und Fehler.json'
-file_path_gb = r'data/Primärverbrauch GB (mit Fehlern).db'
-api_url = "http://localhost:8000/api/1/primary_energy_consumption"
 
 # global variables
 df = pd.DataFrame()
@@ -267,8 +268,10 @@ def load_csv_or_json_or_db_or_api():
                     "Die CSV-Datei enthält doppelte Jahre. Die Daten werden trotzdem verwendet, aber doppelte Jahre können zu fehlerhaften Auswertungen führen."
                 )
         elif selected_country == "Polen":
+            log_info(f"Connecting to the API to retrieve data for {selected_country}........")
             response = requests.get(api_url)
             if response.status_code == 200:
+                log_info(f"Response Code: {response.status_code} Successfully connected to the API {api_url}")
                 raw_data = response.json()
                 # The actual data is in the "data" key and is a dict: {year: {energy_source: value, ...}, ...}
                 api_data = raw_data.get("data", {})
