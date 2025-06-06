@@ -2,7 +2,7 @@
 # Author: Benedikt Krings                                             #
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
-# Version: 2025060603                                                 #
+# Version: 2025060604                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
 
