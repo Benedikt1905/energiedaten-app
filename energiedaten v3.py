@@ -2,7 +2,7 @@
 # Author: Benedikt Krings                                             #
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
-# Version: 2025060405                                                 #
+# Version: 2025060602                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
 
@@ -34,6 +34,10 @@ def log_and_show_error(title, message):
 def log_and_show_warning(title, message):
     log_message("WARNING", f"{title}: {message}")
     messagebox.showwarning(title, message)
+
+# Log-Startnachricht beim Programmstart
+base_path = os.path.dirname(os.path.abspath(__file__))
+log_message("INFO", "Programmstart: Energiedaten-App wurde gestartet.")
 
 # main window with icon
 root = tk.Tk()
