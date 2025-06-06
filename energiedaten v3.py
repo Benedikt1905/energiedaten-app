@@ -286,11 +286,13 @@ def load_csv_or_json_or_db_or_api():
             else:
                 raise ValueError(f"Error retrieving API data: {response.status_code}")
         else:
-            show_error("Error", "Invalid country selection. See the logs.")
+            log_error(f"Invalid country selection: {selected_country}")
+            show_error("Error", "Invalid country selection.")
             return
         update_dropdowns()
         display_data()
     except Exception as e:
+        log_error(f"Error loading data for {selected_country}: {str(e)}")
         show_error("Error loading file", str(e))
 
 # Update dropdown menus
@@ -300,25 +302,22 @@ def update_dropdowns():
         energy_dropdown['values'] = energy_sources
         energy_dropdown.current(0)
         energy_dropdown.bind("<<ComboboxSelected>>", lambda e: display_data())
-
         years = df["Jahr"].astype(str).tolist()
         year_dropdown['values'] = years
         year_dropdown.current(0)
         year_dropdown.bind("<<ComboboxSelected>>", lambda e: update_pie_chart())
     except Exception as e:
+        log_error(f"Error updating dropdown menus: {str(e)}, data can't be updated.")
         show_error("Error updating dropdown menus", str(e),"Check the logs.")
 
 # Update pie chart
 def update_pie_chart():
     try:
         selected_year = year_var.get()
-        if not selected_year:
-            messagebox.showinfo("Error", "Please select a year.")
-            return
-
         selected_row = df[df["Jahr"] == int(selected_year)]
         if selected_row.empty:
-            show_error("Error", "No data available for the selected year. Check the logs.")
+            log_error(f"No data available for the selected year: {selected_year}")
+            show_error("Error", "No data available for the selected year.")
             return
         # all columns except "Year"
         energy_data = selected_row.iloc[0, 1:]  
@@ -339,6 +338,7 @@ def update_pie_chart():
             )
         canvas.draw()
     except Exception as e:
+        log_error(f"Error updating pie chart: {str(e)}, access denied. No data available for the selected year.")   
         show_error("Error updating pie chart", str(e), "Check the logs")
 
 # Function to sort the table
@@ -349,6 +349,7 @@ def sort_table(column, reverse):
             update_table(sorted_df)
             table.heading(column, command=lambda: sort_table(column, not reverse))
     except Exception as e:
+        log_error(f"Error sorting table by {column}: {str(e)}")
         show_error("Error sorting table", str(e), "Check the logs")
 
 # Function to update the table
@@ -360,12 +361,14 @@ def update_table(dataframe):
             tag = "even" if i % 2 == 0 else "odd"
             table.insert("", "end", values=values, tags=(tag,))
     except Exception as e:
+        log_error(f"Error updating table: {str(e)} access denied" )
         show_error("Error updating table", str(e), "Check the logs")
 
 # Updated function to display the data
 def display_data():
     selected_country = country_var.get()
     if not selected_country:
+        log_error("Display data: no country selected. Please select a country.")
         show_error("Error", "Please select a country. Check the logs.")
         return
     try:
@@ -400,6 +403,7 @@ def display_data():
         # Update Pie Chart based on selected year
         update_pie_chart()
     except Exception as e:
+        log_error(f"Error displaying data for {selected_country}: {str(e)}. Data can't be displayed by the function.")
         show_error("Error displaying data", str(e), "Check the logs")
 
 def log_entry_on_close():
@@ -407,7 +411,7 @@ def log_entry_on_close():
     root.destroy()
 
 # Start application
-country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "Polen"]
+country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "Polen", "Afrika"]
 country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_or_api())
 country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
