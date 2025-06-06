@@ -2,7 +2,7 @@
 # Author: Benedikt Krings                                             #
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
-# Version: 2025060602                                                 #
+# Version: 2025060603                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
 
@@ -28,20 +28,20 @@ def log_message(level, message):
         log_file.write(f"[{now}] {level}: {message}\n")
 
 def log_and_show_error(title, message):
-    log_message("ERROR", f"{title}: {message}")
+    log_message("[ERROR]", f"{title}: {message}")
     messagebox.showerror(title, message)
 
 def log_and_show_warning(title, message):
-    log_message("WARNING", f"{title}: {message}")
+    log_message("[WARNING]", f"{title}: {message}")
     messagebox.showwarning(title, message)
 
 # Log-Startnachricht beim Programmstart
 base_path = os.path.dirname(os.path.abspath(__file__))
-log_message("INFO", "Programmstart: Energiedaten-App wurde gestartet.")
+log_message("[INFO]", "energiedaten-app started successfully.")
 
 # main window with icon
 root = tk.Tk()
-root.title("Primärenergieverbrauch v2.5")
+root.title("Primärenergieverbrauch v2.5.1")
 root.config(bg="white")
 base_path = os.path.dirname(os.path.abspath(__file__))
 icon_path = os.path.join(base_path, "img/dbay-icon.ico")
@@ -398,9 +398,15 @@ def display_data():
     except Exception as e:
         log_and_show_error("Error displaying data", str(e), "Check the logs")
 
+def log_entry_on_close():
+    log_message("[INFO]", "energiedaten-app shut down successfully.")
+    root.destroy()
+
 # Start application
 country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "Polen"]
 country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_or_api())
 country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
+root.protocol("WM_DELETE_WINDOW", log_entry_on_close)
 root.mainloop()
+
