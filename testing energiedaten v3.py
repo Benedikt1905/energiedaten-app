@@ -27,34 +27,53 @@ def log_message(level, message):
     with open(log_path, "a", encoding="utf-8") as log_file:
         log_file.write(f"[{now}] {level}: {message}\n")
 
-def log_and_show_error(title, message):
-    log_message("[ERROR]", f"{title}: {message}")
+# Show error, warning or info message in a messagebox graphicaly
+def show_error(title, message):
     messagebox.showerror(title, message)
 
-def log_and_show_warning(title, message):
-    log_message("[WARNING]", f"{title}: {message}")
+def show_warning(title, message):
     messagebox.showwarning(title, message)
+
+def show_info(title, message):
+    messagebox.showinfo(title, message)    
+
+# only logs the info, error or warning message and does not show it in a messagebox in the GUI 
+def log_info(message):
+    log_message("[INFO]", f"{message}")   
+
+def log_warning(message):
+    log_message("[WARNING]", f"{message}")
+
+def log_error(message):
+    log_message("[ERROR]", f"{message}")        
 
 # Log-Startnachricht beim Programmstart
 base_path = os.path.dirname(os.path.abspath(__file__))
-log_message("[INFO]", "energiedaten-app started successfully.")
+log_info ("energiedaten-app started successfully.")
 
 # main window with icon
 root = tk.Tk()
 root.title("Primärenergieverbrauch v2.5.1")
 root.config(bg="white")
+
+#global variable
 base_path = os.path.dirname(os.path.abspath(__file__))
+
+# icon image in Window title bar
 icon_path = os.path.join(base_path, "img/dbay-icon.ico")
 if os.path.exists(icon_path):
     root.iconbitmap(icon_path)
 else:
-    print(f"Icon-Datei '{icon_path}' nicht gefunden. Standard-Icon wird verwendet.")
+    show_warning("Warning", "Default icon is actually used.")
+    log_error(f"Icon-Datei unter'{icon_path}' nicht gefunden. Standard-Icon wird verwendet.")
 
+# logo image in GUI
 logo_path = os.path.join(base_path, "img/dbay-icon.png")
 if os.path.exists(logo_path):
     logo_image = tk.PhotoImage(file=logo_path)
 else:
-    print(f"Logo-Datei '{logo_path}' nicht gefunden.")
+    show_warning("Warning","Logo image not found. No logo image in use.")
+    log_warning(f"Logo image'{logo_path}' not found. No logo image will be used.")
     logo_image = None
 
 # Display logo image in top frame
@@ -164,7 +183,7 @@ def check_csv_for_malicious_code(file_path):
         with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             for line_num, line in enumerate(f, 1):
                 if any(uc in line for uc in ['\u202e', '\u202d', '\u2066', '\u2067', '\u2068', '\u202a', '\u202b', '\u202c', '\u2069']):
-                    log_and_show_warning(
+                    show_warning(
                         "Critical Security Warning!",
                         f"The CSV file contains suspicious Unicode control characters (e.g. RTL/LTR-Override) in line {line_num}.\n"
                         f"Import will be aborted. Check the logs."
@@ -172,7 +191,7 @@ def check_csv_for_malicious_code(file_path):
                     return False
                 for pattern in suspicious_patterns:
                     if re.search(pattern, line, re.IGNORECASE):
-                        log_and_show_warning(
+                        show_warning(
                             "Critical Security Warning!",
                             f"The CSV file contains potentially malicious or dangerous code in line {line_num}.\n"
                             f"Import will be aborted.\nDetected pattern: {pattern} Check the logs."
@@ -180,7 +199,7 @@ def check_csv_for_malicious_code(file_path):
                         return False
         return True
     except Exception as e:
-        log_and_show_error("An error occurred during the security check! Please try again. Check the logs", str(e) )
+        show_error("An error occurred during the security check! Please try again. Check the logs", str(e) )
         return False
     
 # load data from CSV, JSON, DB, or API
@@ -217,7 +236,7 @@ def load_csv_or_json_or_db_or_api():
             years = df["Jahr"].tolist()
             years_sorted = sorted(years)
             if years != years_sorted:
-                log_and_show_warning(
+                show_warning(
                     "Warnung: Jahre nicht sortiert",
                     "Die Jahre in der CSV-Datei sind nicht aufsteigend sortiert. Die Daten werden trotzdem verwendet und die Jahre werden automatisch sortiert."
                 )
@@ -225,7 +244,7 @@ def load_csv_or_json_or_db_or_api():
                 years = df["Jahr"].tolist()
             # Prüfe auf doppelte Jahre nach dem Sortieren
             if len(years) != len(set(years)):
-                log_and_show_warning(
+                show_warning(
                     "Warnung: Doppelte Jahre",
                     "Die CSV-Datei enthält doppelte Jahre. Die Daten werden trotzdem verwendet, aber doppelte Jahre können zu fehlerhaften Auswertungen führen."
                 )
@@ -250,7 +269,7 @@ def load_csv_or_json_or_db_or_api():
             years = df["Jahr"].tolist()
             years_sorted = sorted(years)
             if years != years_sorted:
-                log_and_show_warning(
+                show_warning(
                     "Warnung: Jahre nicht sortiert",
                     "Die Jahre in der Datenbank sind nicht aufsteigend sortiert. Die Daten werden trotzdem verwendet und die Jahre werden automatisch sortiert."
                 )
@@ -258,7 +277,7 @@ def load_csv_or_json_or_db_or_api():
                 years = df["Jahr"].tolist()
             # Prüfe auf doppelte Jahre nach dem Sortieren
             if len(years) != len(set(years)):
-                log_and_show_warning(
+                show_warning(
                     "Warnung: Doppelte Jahre",
                     "Die Datenbank enthält doppelte Jahre. Die Daten werden trotzdem verwendet, aber doppelte Jahre können zu fehlerhaften Auswertungen führen."
                 )
@@ -282,12 +301,12 @@ def load_csv_or_json_or_db_or_api():
             else:
                 raise ValueError(f"Error retrieving API data: {response.status_code}")
         else:
-            log_and_show_error("Error", "Invalid country selection. See the logs.")
+            show_error("Error", "Invalid country selection. See the logs.")
             return
         update_dropdowns()
         display_data()
     except Exception as e:
-        log_and_show_error("Error loading file", str(e))
+        show_error("Error loading file", str(e))
 
 # Update dropdown menus
 def update_dropdowns():
@@ -302,7 +321,7 @@ def update_dropdowns():
         year_dropdown.current(0)
         year_dropdown.bind("<<ComboboxSelected>>", lambda e: update_pie_chart())
     except Exception as e:
-        log_and_show_error("Error updating dropdown menus", str(e),"Check the logs.")
+        show_error("Error updating dropdown menus", str(e),"Check the logs.")
 
 # Update pie chart
 def update_pie_chart():
@@ -314,7 +333,7 @@ def update_pie_chart():
 
         selected_row = df[df["Jahr"] == int(selected_year)]
         if selected_row.empty:
-            log_and_show_error("Error", "No data available for the selected year. Chekc the logs.")
+            show_error("Error", "No data available for the selected year. Check the logs.")
             return
         # all columns except "Year"
         energy_data = selected_row.iloc[0, 1:]  
@@ -335,7 +354,7 @@ def update_pie_chart():
             )
         canvas.draw()
     except Exception as e:
-        log_and_show_error("Error updating pie chart", str(e), "Check the logs")
+        show_error("Error updating pie chart", str(e), "Check the logs")
 
 # Function to sort the table
 def sort_table(column, reverse):
@@ -345,7 +364,7 @@ def sort_table(column, reverse):
             update_table(sorted_df)
             table.heading(column, command=lambda: sort_table(column, not reverse))
     except Exception as e:
-        log_and_show_error("Error sorting table", str(e), "Check the logs")
+        show_error("Error sorting table", str(e), "Check the logs")
 
 # Function to update the table
 def update_table(dataframe):
@@ -356,13 +375,13 @@ def update_table(dataframe):
             tag = "even" if i % 2 == 0 else "odd"
             table.insert("", "end", values=values, tags=(tag,))
     except Exception as e:
-        log_and_show_error("Error updating table", str(e), "Check the logs")
+        show_error("Error updating table", str(e), "Check the logs")
 
 # Updated function to display the data
 def display_data():
     selected_country = country_var.get()
     if not selected_country:
-        log_and_show_error("Error", "Please select a country. Check the logs.")
+        show_error("Error", "Please select a country. Check the logs.")
         return
     try:
         table.delete(*table.get_children())
@@ -396,7 +415,7 @@ def display_data():
         # Update Pie Chart based on selected year
         update_pie_chart()
     except Exception as e:
-        log_and_show_error("Error displaying data", str(e), "Check the logs")
+        show_error("Error displaying data", str(e), "Check the logs")
 
 def log_entry_on_close():
     log_message("[INFO]", "energiedaten-app shut down successfully.")
