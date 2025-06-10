@@ -1,0 +1,12 @@
+Folgende Module müssen noch installiert werden damit dieses Programm ausführbar ist.
+Vor dem installieren der Module empfiehlt sich folgenden Befehl auszuführen um sicherzustellen das pip aktuell ist:
+
+"python -m pip install --upgrade pip"
+
+Folgende Module sind keine Standardmodule:
+re
+mathplotlib
+chardet
+datetime
+requests
+pandas

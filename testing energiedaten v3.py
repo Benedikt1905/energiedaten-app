@@ -2,7 +2,7 @@
 # Author: Benedikt Krings                                             #
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
-# Version: 2025061001                                                 #
+# Version: 2025061002                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
 import pandas as pd
@@ -17,13 +17,13 @@ import chardet
 import re
 import datetime
 
-# path to data files
+#---------File paths and API URL---------
 file_path_de = r'data/Primärverbrauch DE.csv'
 file_path_fr = r'data/Primärverbrauch mehr Daten und Fehler.json'
 file_path_gb = r'data/Primärverbrauch GB (mit Fehlern).db'
 api_url = "http://localhost:8000/api/1/primary_energy_consumption"
 
-# function to log messages to a file
+#------------Logging-----------
 def log_message(level, message):
     log_dir = os.path.join(base_path, "logs")
     if not os.path.exists(log_dir):
@@ -57,15 +57,16 @@ def log_error(message):
 base_path = os.path.dirname(os.path.abspath(__file__))
 log_info ("energiedaten-app started successfully.")
 
-# main window with icon
+def log_entry_on_close():
+    log_message("[INFO]", "energiedaten-app shut down successfully.")
+    root.destroy()
+
+#--------------GUI--------------
 root = tk.Tk()
-root.title("Primärenergieverbrauch v2.5.1")
+root.title("Primärenergieverbrauch v2.6")
 root.config(bg="white")
 
-#global variable
-base_path = os.path.dirname(os.path.abspath(__file__))
-
-# icon image in Window title bar
+#-----------Icon and logo images-----------
 icon_path = os.path.join(base_path, "img/dbay-icon.ico")
 if os.path.exists(icon_path):
     root.iconbitmap(icon_path)
@@ -93,7 +94,7 @@ country_var = tk.StringVar()
 energy_var = tk.StringVar()
 year_var = tk.StringVar()
 
-# top-Frame and styles for dropdown-menus
+#--------------Dropdown menus--------------
 top_frame = tk.Frame(root, bg="white")
 top_frame.pack(pady=10)
 style = ttk.Style()
@@ -124,7 +125,7 @@ for i, label in enumerate(["Maximaler Jahresverbrauch", "Durchschn. Jahresverbra
     stat_labels[label] = tk.Label(middle_frame, text="... PJ", relief="sunken", font=("Arial", 16), bg="white", fg="black")
     stat_labels[label].grid(row=i, column=1, padx=5, pady=2)
 
-# pie chart
+#---------------Pie chart---------------
 fig, ax = plt.subplots(figsize=(5, 4))
 canvas = FigureCanvasTkAgg(fig, master=middle_frame)
 canvas.get_tk_widget().grid(row=0, column=2, rowspan=3, padx=20, pady=10)
@@ -134,12 +135,11 @@ no_data_label = tk.Label(middle_frame, text="Keine Werte verfügbar", font=("Ari
 no_data_label.grid(row=3, column=2, pady=10)
 no_data_label.grid_remove()
 
-# table-Frame
+#---------------Table styling---------------
 table_frame = tk.Frame(root, bg="white", bd=1, relief="solid")
 table_frame.pack(padx=10, pady=10)
 
-# styles for the table
-style.configure("Treeview",
+style.configure("Treeview", 
                 rowheight=25,
                 font=("Arial", 16),
                 borderwidth=1,
@@ -163,6 +163,7 @@ scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
 scrollbar.pack(side="right", fill="y")
 table.configure(yscrollcommand=scrollbar.set)
 
+#----------------Malware check for CSV file---------------
 # function to check the CSV file for malicious code according to the client's security concept ^^
 def check_csv_for_malicious_code(file_path):
     suspicious_patterns = [
@@ -205,7 +206,7 @@ def check_csv_for_malicious_code(file_path):
         show_error("An error occurred during the security check! Please try again. Check the logs", str(e) )
         return False
     
-# load data from CSV, JSON, DB, or API
+#--------------Loading Data from CSV, JSON, DB and API-------------
 def load_csv_or_json_or_db_or_api():
     global df
     try:
@@ -297,7 +298,7 @@ def load_csv_or_json_or_db_or_api():
         log_error(f"Error loading data for {selected_country}: {str(e)}")
         show_error("Error loading file", str(e))
 
-# update dropdown menus
+#--------------Update dropdown menu----------------
 def update_dropdowns():
     try:
         energy_sources = [col for col in df.columns if col != "Jahr"]
@@ -312,7 +313,7 @@ def update_dropdowns():
         log_error(f"Error updating dropdown menus: {str(e)}, data can't be updated.")
         show_error("Error updating dropdown menus", str(e),"Check the logs.")
 
-# update pie chart
+#--------------Update pie chart----------------
 def update_pie_chart():
     try:
         selected_year = year_var.get()
@@ -343,7 +344,7 @@ def update_pie_chart():
         log_error(f"Error updating pie chart: {str(e)}, access denied. No data available for the selected year.")   
         show_error("Error updating pie chart", str(e), "Check the logs")
 
-# function to sort the table
+#--------------Sorting and updating table--------------
 def sort_table(column, reverse):
     try:
         if column == "Jahr" or column in df.columns[1:]:
@@ -354,7 +355,7 @@ def sort_table(column, reverse):
         log_error(f"Error sorting table by {column}: {str(e)}")
         show_error("Error sorting table", str(e), "Check the logs")
 
-# function to update the table
+# update table
 def update_table(dataframe):
     try:
         table.delete(*table.get_children())
@@ -366,7 +367,7 @@ def update_table(dataframe):
         log_error(f"Error updating table: {str(e)} access denied" )
         show_error("Error updating table", str(e), "Check the logs")
 
-# updated function to display the data
+#--------------Display data in table and calculate statistics--------------
 def display_data():
     selected_country = country_var.get()
     if not selected_country:
@@ -391,7 +392,7 @@ def display_data():
 
         table.tag_configure("even", background="white")
         table.tag_configure("odd", background="lightgrey")
-
+        #--------calculate average, max and min values----------
         selected_energy = energy_var.get()
         if selected_energy and selected_energy in df.columns:
             max_value = df[selected_energy].max()
@@ -408,10 +409,6 @@ def display_data():
         log_error(f"Error displaying data for {selected_country}: {str(e)}. Data can't be displayed by the function.")
         show_error("Error displaying data", str(e), "Check the logs")
 
-def log_entry_on_close():
-    log_message("[INFO]", "energiedaten-app shut down successfully.")
-    root.destroy()
-
 # update dropdowns and load initial data
 country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "Polen", "Afrika"]
 country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_or_api())
@@ -419,5 +416,5 @@ country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
 # log entry when the application is closed
 root.protocol("WM_DELETE_WINDOW", log_entry_on_close)
-# start the application
+#--------------Main loop--------------
 root.mainloop()
