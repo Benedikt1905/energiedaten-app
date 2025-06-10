@@ -65,7 +65,7 @@ def log_entry_on_close():
 
 #--------------GUI--------------
 root = tk.Tk()
-root.title("Primärenergieverbrauch v2.6")
+root.title("Primärenergieverbrauch v2.6.1")
 root.config(bg="white")
 
 #-----------Icon and logo images-----------
