@@ -118,12 +118,30 @@ year_dropdown.grid(row=2, column=1, padx=5, pady=5, sticky="w")
 middle_frame = tk.Frame(root, bg="white")
 middle_frame.pack(pady=10)
 
-# statistics labels
+#----------------Statistics labels styling----------------
 stat_labels = {}
 for i, label in enumerate(["Maximaler Jahresverbrauch", "Durchschn. Jahresverbrauch", "Minimaler Jahresverbrauch"]):
-    tk.Label(middle_frame, text=label + ":", anchor="w", font=("Arial", 16, "bold"), bg="white", fg="black").grid(row=i, column=0, sticky="w", padx=5, pady=2)
-    stat_labels[label] = tk.Label(middle_frame, text="... PJ", relief="sunken", font=("Arial", 16), bg="white", fg="black")
-    stat_labels[label].grid(row=i, column=1, padx=5, pady=2)
+    tk.Label(
+        middle_frame,
+        text=label + ":",
+        anchor="w",
+        font=("Arial", 16, "bold"),
+        bg="white",
+        fg="black"
+    ).grid(row=i, column=0, sticky="w", padx=5, pady=8)
+    stat_labels[label] = tk.Label(
+        middle_frame,
+        text="... PJ",
+        font=("Arial", 16),
+        bg="#f0f4fa",              
+        fg="#222",
+        relief="flat",
+        padx=25, pady=8,           
+        borderwidth=2,
+        highlightbackground="#b0b8c1",
+        highlightthickness=1,
+    )
+    stat_labels[label].grid(row=i, column=1, padx=10, pady=8, sticky="ew")
 
 #----------------Malware check for CSV file---------------
 def check_csv_for_malicious_code(file_path):
