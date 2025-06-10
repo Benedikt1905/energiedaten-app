@@ -5,7 +5,7 @@ Vor dem installieren der Module empfiehlt sich folgenden Befehl auszuführen um 
 
 Folgende Module sind keine Standardmodule:
 re
-mathplotlib
+matplotlib
 chardet
 datetime
 requests
