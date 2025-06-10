@@ -125,44 +125,6 @@ for i, label in enumerate(["Maximaler Jahresverbrauch", "Durchschn. Jahresverbra
     stat_labels[label] = tk.Label(middle_frame, text="... PJ", relief="sunken", font=("Arial", 16), bg="white", fg="black")
     stat_labels[label].grid(row=i, column=1, padx=5, pady=2)
 
-#---------------Pie chart---------------
-fig, ax = plt.subplots(figsize=(5, 4))
-canvas = FigureCanvasTkAgg(fig, master=middle_frame)
-canvas.get_tk_widget().grid(row=0, column=2, rowspan=3, padx=20, pady=10)
-
-# label for "Keine Werte verfügbar"
-no_data_label = tk.Label(middle_frame, text="Keine Werte verfügbar", font=("Arial", 16), fg="red", bg="white")
-no_data_label.grid(row=3, column=2, pady=10)
-no_data_label.grid_remove()
-
-#---------------Table styling---------------
-table_frame = tk.Frame(root, bg="white", bd=1, relief="solid")
-table_frame.pack(padx=10, pady=10)
-
-style.configure("Treeview", 
-                rowheight=25,
-                font=("Arial", 16),
-                borderwidth=1,
-                relief="solid",
-                background="white",
-                fieldbackground="white")
-style.configure("Treeview.Heading",
-                font=("Arial", 18, "bold"),
-                borderwidth=1,
-                relief="solid")
-style.map("Treeview",
-          background=[("selected", "lightblue")],
-          foreground=[("selected", "black")])
-style.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})])
-
-table = ttk.Treeview(table_frame, show="headings", height=10, style="Treeview")
-table.pack(side="left", padx=5, pady=5, fill="both", expand=True)
-
-# add scrollbar for the table
-scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
-scrollbar.pack(side="right", fill="y")
-table.configure(yscrollcommand=scrollbar.set)
-
 #----------------Malware check for CSV file---------------
 # function to check the CSV file for malicious code according to the client's security concept ^^
 def check_csv_for_malicious_code(file_path):
@@ -313,7 +275,17 @@ def update_dropdowns():
         log_error(f"Error updating dropdown menus: {str(e)}, data can't be updated.")
         show_error("Error updating dropdown menus", str(e),"Check the logs.")
 
-#--------------Update pie chart----------------
+#---------------Pie chart-----------------
+fig, ax = plt.subplots(figsize=(5, 4))
+canvas = FigureCanvasTkAgg(fig, master=middle_frame)
+canvas.get_tk_widget().grid(row=0, column=2, rowspan=3, padx=20, pady=10)
+
+# label for "Keine Werte verfügbar"
+no_data_label = tk.Label(middle_frame, text="Keine Werte verfügbar", font=("Arial", 16), fg="red", bg="white")
+no_data_label.grid(row=3, column=2, pady=10)
+no_data_label.grid_remove()
+
+# update values in pie chart
 def update_pie_chart():
     try:
         selected_year = year_var.get()
@@ -344,7 +316,35 @@ def update_pie_chart():
         log_error(f"Error updating pie chart: {str(e)}, access denied. No data available for the selected year.")   
         show_error("Error updating pie chart", str(e), "Check the logs")
 
-#--------------Sorting and updating table--------------
+#------------------Table------------------
+table_frame = tk.Frame(root, bg="white", bd=1, relief="solid")
+table_frame.pack(padx=10, pady=10)
+
+style.configure("Treeview", 
+                rowheight=25,
+                font=("Arial", 16),
+                borderwidth=1,
+                relief="solid",
+                background="white",
+                fieldbackground="white")
+style.configure("Treeview.Heading",
+                font=("Arial", 18, "bold"),
+                borderwidth=1,
+                relief="solid")
+style.map("Treeview",
+          background=[("selected", "lightblue")],
+          foreground=[("selected", "black")])
+style.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})])
+
+table = ttk.Treeview(table_frame, show="headings", height=10, style="Treeview")
+table.pack(side="left", padx=5, pady=5, fill="both", expand=True)
+
+# add scrollbar for the table
+scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
+scrollbar.pack(side="right", fill="y")
+table.configure(yscrollcommand=scrollbar.set)
+
+# sort table by column
 def sort_table(column, reverse):
     try:
         if column == "Jahr" or column in df.columns[1:]:
