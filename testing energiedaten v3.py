@@ -2,7 +2,7 @@
 # Author: Benedikt Krings                                             #
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
-# Version: 2025061002                                                 #
+# Version: 2025061003                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
 import pandas as pd
