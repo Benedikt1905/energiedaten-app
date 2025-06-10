@@ -208,6 +208,7 @@ def load_csv_or_json_or_db_or_api():
             for col in df.columns:
                 if col != "Jahr":
                     df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
+            df.rename(columns={col: col.replace("_", " ") for col in df.columns if col != "Jahr"}, inplace=True)        
             # check if years are sorted and if not round them
             years = df["Jahr"].tolist()
             years_sorted = sorted(years)
