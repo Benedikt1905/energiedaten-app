@@ -2,7 +2,7 @@
 # Author: Benedikt Krings                                             #
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
-# Version: 2025061006                                                 #
+# Version: 2025061007                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
 # If modules are not installed, please install them via pip, note for this in file "install requirements.txt"
@@ -235,17 +235,16 @@ def load_csv_or_json_or_db_or_api():
             if years != years_sorted:
                 log_warning("The years have not been sorted in ascending order. The data will be used anyway and the years will be showed correctly anyways.")
                 show_warning(
-                    "Warnung: Jahre nicht sortiert",
-                    "Die Jahre in der CSV-Datei sind nicht aufsteigend sortiert. Die Daten werden trotzdem verwendet und die Jahre werden automatisch sortiert."
-                )
+                    "Warning: Years Not Sorted",
+                    "The years have not been sorted in ascending order. The data will be used anyway and the years will be showed correctly anyways.")
                 df = df.sort_values(by="Jahr").reset_index(drop=True)
                 years = df["Jahr"].tolist()
             # check for duplicate years
             if len(years) != len(set(years)):
                 log_warning("The CSV file contains duplicate years. The data will be used anyway, but duplicate years can lead to incorrect evaluations.")
                 show_warning(
-                    "Warnung: Doppelte Jahre",
-                    "Die CSV-Datei enthält doppelte Jahre. Die Daten werden trotzdem verwendet, aber doppelte Jahre können zu fehlerhaften Auswertungen führen."
+                    "Warning: Duplicate Years",
+                    "The CSV file contains duplicate years. The data will be used anyway, but duplicate years can lead to incorrect evaluations."
                 )
         elif selected_country == "Polen":
             log_info(f"Connecting to the API to retrieve data for {selected_country}........")
