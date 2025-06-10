@@ -2,7 +2,7 @@
 # Author: Benedikt Krings                                             #
 # GitHub Repo: https://github.com/Benedikt1905/energiedaten-app       #
 # GitHub Branch: main                                                 #
-# Version: 2025061003                                                 #
+# Version: 2025061006                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
 # If modules are not installed, please install them via pip, note for this in file "Benötigte Module installieren.txt"
@@ -67,7 +67,7 @@ def log_entry_on_close():
 
 #--------------GUI--------------
 root = tk.Tk()
-root.title("Primärenergieverbrauch v2.6.1")
+root.title("Primärenergieverbrauch v2.7")
 root.config(bg="white")
 
 #-----------Icon and logo images-----------
@@ -302,15 +302,29 @@ def update_pie_chart():
             wedges, texts = ax.pie([1], colors=["lightgrey"])
             ax.text(0, 0, "No values\navailable", ha='center', va='center', fontsize=16, color="red")
         else:
-            explode = [0.01] * len(energy_data)
-            ax.pie(
-                energy_data,
-                labels=energy_data.index,
-                autopct='%1.1f%%',
+            # Filter out zero values and dont label and display them
+            values = energy_data.values
+            labels = [label if value > 0 else '' for label, value in zip(energy_data.index, values)]
+            colors = plt.cm.tab20.colors
+            # Draw pie chart
+            explode = [0.01] * len(values)
+            wedges, texts, autotexts = ax.pie(
+                values,
+                labels=labels,
+                autopct=lambda pct: f'{pct:.1f}%' if pct > 0 else '',
                 explode=explode,
-                shadow=True, 
-                startangle=90
+                shadow=True,
+                startangle=90,
+                labeldistance=1.15,
+                pctdistance=0.85,
+                colors=colors[:len(values)]
             )
+            for text in texts:
+                text.set_fontsize(12)
+            for autotext in autotexts:
+                autotext.set_fontsize(11)
+                autotext.set_color("black")
+                autotext.set_bbox(dict(facecolor='white', edgecolor='none', boxstyle='round,pad=0.2', alpha=0.7))
         canvas.draw()
     except Exception as e:
         log_error(f"Error updating pie chart: {str(e)}, access denied. No data available for the selected year.")   
