@@ -7,6 +7,8 @@
 #######################################################################
 # If modules are not installed, please install them via pip, note for this in file "install requirements.txt"
 # Theirs a list of all required modules and how to install them.
+# Version 2.7 LTS (Long Term Support) of the energiedaten-app
+
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk, messagebox
