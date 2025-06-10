@@ -1,0 +1,141 @@
+energiedaten-app requirements, installation guide. 
+
+English/English:
+The following modules must be installed for this program to run.
+Before installing the modules, it is recommended to run the following command to ensure that pip is up to date:
+
+"python -m pip install --upgrade pip"
+
+Folllowing modules are not standard modules:
+tkinter
+matplotlib
+pandas
+json
+requests
+sqlite3
+
+Installation
+pip install Tkinter matplotlib pandas 
+pip install json requests sqlite3
+-------------------------------------
+German/Deutsch:
+Folgende Module müssen noch installiert werden damit dieses Programm ausführbar ist.
+Vor dem installieren der Module empfiehlt sich folgenden Befehl auszuführen um sicherzustellen das pip aktuell ist:
+
+"python -m pip install --upgrade pip"
+
+Folgende Module sind keine Standardmodule:
+tkinter
+matplotlib
+pandas
+json
+requests
+sqlite3
+
+Installation
+pip install Tkinter matplotlib pandas 
+pip install json requests sqlite3
+-------------------------------------
+France/Français:
+Les modules suivants doivent être installés pour que ce programme fonctionne.
+Avant d'installer les modules, il est recommandé d'exécuter la commande suivante pour s'assurer que pip est à jour :
+
+"python -m pip install --upgrade pip"
+
+Les modules suivants ne sont pas des modules standards :
+tkinter
+matplotlib
+pandas
+json
+requests
+sqlite3
+Installation
+pip install Tkinter matplotlib pandas
+pip install json requests sqlite3
+--------------------------------------
+Polish/Polski:
+Następujące moduły muszą być zainstalowane, aby ten program działał.
+Przed zainstalowaniem modułów zaleca się uruchomienie następującego polecenia, aby upewnić się, że pip jest aktualny:
+
+"python -m pip install --upgrade pip"
+
+Następujące moduły nie są standardowymi modułami:
+tkinter
+matplotlib
+pandas
+json
+requests
+sqlite3
+
+Instalacja
+pip install Tkinter matplotlib pandas
+pip install json requests sqlite3
+
+Spanish/Español:
+Los siguientes módulos deben instalarse para que este programa funcione.
+Antes de instalar los módulos, se recomienda ejecutar el siguiente comando para asegurarse de que pip esté actualizado:
+
+"python -m pip install --upgrade pip"
+
+Los siguientes módulos no son módulos estándar:
+tkinter
+matplotlib
+pandas
+json
+requests
+sqlite3
+Instalación
+pip install Tkinter matplotlib pandas
+pip install json requests sqlite3
+--------------------------------------
+Arabic/العربية:
+يجب تثبيت الوحدات التالية حتى يعمل هذا البرنامج.
+قبل تثبيت الوحدات، يوصى بتشغيل الأمر التالي للتأكد من أن pip محدث:
+
+"python -m pip install --upgrade pip"
+
+الوحدات التالية ليست وحدات قياسية:
+tkinter
+matplotlib
+pandas
+json
+requests
+sqlite3
+التثبيت
+pip install Tkinter matplotlib pandas
+pip install json requests sqlite3
+--------------------------------------
+Russian/Русский:
+Для работы этой программы необходимо установить следующие модули.
+Перед установкой модулей рекомендуется выполнить следующую команду, чтобы убедиться, что pip обновлен:
+
+"python -m pip install --upgrade pip"
+
+Следующие модули не являются стандартными:
+tkinter
+matplotlib
+pandas
+json
+requests
+sqlite3
+Установка
+pip install Tkinter matplotlib pandas
+pip install json requests sqlite3
+--------------------------------------
+Kurdish/Kurdî:
+بۆ ئەوەی ئەم بەرنامە کار بکات، پێویستە ئەم مۆدولانە دامەزرابن.
+پێش دامەزراندنی مۆدولەکان پێشنیار دەکرێت ئەم فەرمانە جێبەجێ بکەیت بۆ دڵنیایی لەوەی pip نوێکراوە:
+
+"python -m pip install --upgrade pip"
+
+ئەم مۆدولانە مۆدولە ستاندارد نییەن:
+tkinter
+matplotlib
+pandas
+json
+requests
+sqlite3
+دامەزراندن:
+pip install Tkinter matplotlib pandas
+pip install json requests sqlite3
+--------------------------------------

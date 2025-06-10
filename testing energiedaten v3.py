@@ -5,6 +5,8 @@
 # Version: 2025061003                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
+# If modules are not installed, please install them via pip, note for this in file "Benötigte Module installieren.txt"
+# Theirs a list of all required modules and how to install them.
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk, messagebox
