@@ -23,7 +23,7 @@ file_path_fr = r'data/Primärverbrauch mehr Daten und Fehler.json'
 file_path_gb = r'data/Primärverbrauch GB (mit Fehlern).db'
 api_url = "http://localhost:8000/api/1/primary_energy_consumption"
 
-# Function to log messages to a file
+# function to log messages to a file
 def log_message(level, message):
     log_dir = os.path.join(base_path, "logs")
     if not os.path.exists(log_dir):
@@ -33,7 +33,7 @@ def log_message(level, message):
     with open(log_path, "a", encoding="utf-8") as log_file:
         log_file.write(f"[{now}] {level}: {message}\n")
 
-# Show error, warning or info message in a messagebox graphicaly
+# show error, warning or info message in a messagebox graphicaly
 def show_error(title, message):
     messagebox.showerror(title, message)
 
@@ -53,7 +53,7 @@ def log_warning(message):
 def log_error(message):
     log_message("[ERROR]", f"{message}")        
 
-# Log-Startnachricht beim Programmstart
+# log startup message in the log file
 base_path = os.path.dirname(os.path.abspath(__file__))
 log_info ("energiedaten-app started successfully.")
 
@@ -82,7 +82,7 @@ else:
     show_warning("Warning","Logo image not found. No logo image in use.")
     logo_image = None
 
-# Display logo image in top frame
+# display logo image in top frame
 if logo_image:
     logo_label = tk.Label(root, image=logo_image, bg="white")
     logo_label.place(relx=0.20, rely=-0.04)
@@ -93,7 +93,7 @@ country_var = tk.StringVar()
 energy_var = tk.StringVar()
 year_var = tk.StringVar()
 
-# Top-Frame and styles for dropdown-menus
+# top-Frame and styles for dropdown-menus
 top_frame = tk.Frame(root, bg="white")
 top_frame.pack(pady=10)
 style = ttk.Style()
@@ -134,7 +134,7 @@ no_data_label = tk.Label(middle_frame, text="Keine Werte verfügbar", font=("Ari
 no_data_label.grid(row=3, column=2, pady=10)
 no_data_label.grid_remove()
 
-# Table-Frame
+# table-Frame
 table_frame = tk.Frame(root, bg="white", bd=1, relief="solid")
 table_frame.pack(padx=10, pady=10)
 
@@ -158,12 +158,12 @@ style.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})])
 table = ttk.Treeview(table_frame, show="headings", height=10, style="Treeview")
 table.pack(side="left", padx=5, pady=5, fill="both", expand=True)
 
-# Add scrollbar
+# add scrollbar for the table
 scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
 scrollbar.pack(side="right", fill="y")
 table.configure(yscrollcommand=scrollbar.set)
 
-# Function to check the CSV file for malicious code according to the client's security concept ^^
+# function to check the CSV file for malicious code according to the client's security concept ^^
 def check_csv_for_malicious_code(file_path):
     suspicious_patterns = [
         r"^=",  
@@ -211,17 +211,17 @@ def load_csv_or_json_or_db_or_api():
     try:
         selected_country = country_var.get()
         if selected_country == "Deutschland":
-            # Security check before reading!
+            # security check before reading!
             if not check_csv_for_malicious_code(file_path_de):
                 return
-            # Automatically detect encoding
+            # automatically detect encoding
             with open(file_path_de, 'rb') as f:
                 rawdata = f.read(4096)
                 result = chardet.detect(rawdata)
                 detected_encoding = result['encoding'] if result['encoding'] else 'utf-8'
             try:
                 raw_df = pd.read_csv(file_path_de, sep=';', encoding=detected_encoding, skip_blank_lines=True)
-                # Entferne komplett leere Zeilen (nur zur Sicherheit)
+                # remove empty rows 
                 raw_df = raw_df.dropna(how='all')
             except UnicodeDecodeError:
                 log_error(f"The file '{file_path_de}' could not be read with the detected encoding '{detected_encoding}'.")
@@ -244,11 +244,11 @@ def load_csv_or_json_or_db_or_api():
             conn.close()
             df.rename(columns={df.columns[0]: "Jahr"}, inplace=True)
             df["Jahr"] = pd.to_numeric(df["Jahr"], errors='coerce').fillna(0).astype(int)
-             # Alle Werte (außer Jahr) auf ganze Zahlen runden
+             # round all colums to integers
             for col in df.columns:
                 if col != "Jahr":
                     df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
-            # Jahre prüfen und ggf. sortieren
+            # check if years are sorted and if not round them
             years = df["Jahr"].tolist()
             years_sorted = sorted(years)
             if years != years_sorted:
@@ -259,7 +259,7 @@ def load_csv_or_json_or_db_or_api():
                 )
                 df = df.sort_values(by="Jahr").reset_index(drop=True)
                 years = df["Jahr"].tolist()
-            # Prüfe auf doppelte Jahre nach dem Sortieren
+            # check for duplicate years
             if len(years) != len(set(years)):
                 log_warning("The CSV file contains duplicate years. The data will be used anyway, but duplicate years can lead to incorrect evaluations.")
                 show_warning(
@@ -272,15 +272,15 @@ def load_csv_or_json_or_db_or_api():
             if response.status_code == 200:
                 log_info(f"Response Code: {response.status_code} Successfully connected to the API {api_url}")
                 raw_data = response.json()
-                # The actual data is in the "data" key and is a dict: {year: {energy_source: value, ...}, ...}
+                # the actual data is in the "data" key and is a dict: {year: {energy_source: value, ...}, ...}
                 api_data = raw_data.get("data", {})
                 if not api_data:
                     raise ValueError("The API did not return any data.")
-                # Convert to DataFrame: year as column
+                # convert to DataFrame: year as column
                 df_api = pd.DataFrame.from_dict(api_data, orient="index")
                 df_api.index.name = "Jahr"
                 df_api.reset_index(inplace=True)
-                # Convert year to int
+                # convert year to int
                 df_api["Jahr"] = pd.to_numeric(df_api["Jahr"], errors='coerce').fillna(0).astype(int)
                 for col in df_api.columns[1:]:
                     df_api[col] = pd.to_numeric(df_api[col], errors='coerce').fillna(0)
@@ -297,7 +297,7 @@ def load_csv_or_json_or_db_or_api():
         log_error(f"Error loading data for {selected_country}: {str(e)}")
         show_error("Error loading file", str(e))
 
-# Update dropdown menus
+# update dropdown menus
 def update_dropdowns():
     try:
         energy_sources = [col for col in df.columns if col != "Jahr"]
@@ -312,7 +312,7 @@ def update_dropdowns():
         log_error(f"Error updating dropdown menus: {str(e)}, data can't be updated.")
         show_error("Error updating dropdown menus", str(e),"Check the logs.")
 
-# Update pie chart
+# update pie chart
 def update_pie_chart():
     try:
         selected_year = year_var.get()
@@ -343,7 +343,7 @@ def update_pie_chart():
         log_error(f"Error updating pie chart: {str(e)}, access denied. No data available for the selected year.")   
         show_error("Error updating pie chart", str(e), "Check the logs")
 
-# Function to sort the table
+# function to sort the table
 def sort_table(column, reverse):
     try:
         if column == "Jahr" or column in df.columns[1:]:
@@ -354,7 +354,7 @@ def sort_table(column, reverse):
         log_error(f"Error sorting table by {column}: {str(e)}")
         show_error("Error sorting table", str(e), "Check the logs")
 
-# Function to update the table
+# function to update the table
 def update_table(dataframe):
     try:
         table.delete(*table.get_children())
@@ -366,7 +366,7 @@ def update_table(dataframe):
         log_error(f"Error updating table: {str(e)} access denied" )
         show_error("Error updating table", str(e), "Check the logs")
 
-# Updated function to display the data
+# updated function to display the data
 def display_data():
     selected_country = country_var.get()
     if not selected_country:
@@ -383,7 +383,7 @@ def display_data():
             table.heading(col, text=col, anchor="center", command=lambda c=col: sort_table(c, False))
             table.column(col, anchor="center", width=170)
 
-        # Paint table line white and grey alternatively
+        # paint table line white and grey alternatively
         for i, (_, row) in enumerate(df.iterrows()):
             values = [row["Jahr"]] + list(row[1:])
             tag = "even" if i % 2 == 0 else "odd"
@@ -402,7 +402,7 @@ def display_data():
             stat_labels["Durchschn. Jahresverbrauch"].config(text=f"{mean_value:.2f} PJ")
             stat_labels["Minimaler Jahresverbrauch"].config(text=f"{min_value:.2f} PJ")
 
-        # Update Pie Chart based on selected year
+        # update Pie Chart based on selected year
         update_pie_chart()
     except Exception as e:
         log_error(f"Error displaying data for {selected_country}: {str(e)}. Data can't be displayed by the function.")
@@ -412,10 +412,12 @@ def log_entry_on_close():
     log_message("[INFO]", "energiedaten-app shut down successfully.")
     root.destroy()
 
-# Start application
+# update dropdowns and load initial data
 country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "Polen", "Afrika"]
 country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_or_api())
 country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
+# log entry when the application is closed
 root.protocol("WM_DELETE_WINDOW", log_entry_on_close)
+# start the application
 root.mainloop()
