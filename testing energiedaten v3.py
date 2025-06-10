@@ -5,7 +5,7 @@
 # Version: 2025061006                                                 #
 #          YYYYMMDD Change Number                                     #
 #######################################################################
-# If modules are not installed, please install them via pip, note for this in file "Benötigte Module installieren.txt"
+# If modules are not installed, please install them via pip, note for this in file "install requirements.txt"
 # Theirs a list of all required modules and how to install them.
 import pandas as pd
 import tkinter as tk
