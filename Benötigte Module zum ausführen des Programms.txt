@@ -10,3 +10,5 @@ chardet
 datetime
 requests
 pandas
+pip install Tkinter matplotlib pandas 
+pip install json requests sqlite3

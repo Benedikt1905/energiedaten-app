@@ -17,7 +17,10 @@ import chardet
 import re
 import datetime
 
-#---------File paths and API URL---------
+#---------Global variables---------
+base_path = os.path.dirname(os.path.abspath(__file__))
+logo_path = os.path.join(base_path, "img/dbay-icon.png")
+icon_path = os.path.join(base_path, "img/dbay-icon.ico")
 file_path_de = r'data/Primärverbrauch DE.csv'
 file_path_fr = r'data/Primärverbrauch mehr Daten und Fehler.json'
 file_path_gb = r'data/Primärverbrauch GB (mit Fehlern).db'
@@ -54,7 +57,6 @@ def log_error(message):
     log_message("[ERROR]", f"{message}")        
 
 # log startup message in the log file
-base_path = os.path.dirname(os.path.abspath(__file__))
 log_info ("energiedaten-app started successfully.")
 
 def log_entry_on_close():
@@ -67,7 +69,6 @@ root.title("Primärenergieverbrauch v2.6")
 root.config(bg="white")
 
 #-----------Icon and logo images-----------
-icon_path = os.path.join(base_path, "img/dbay-icon.ico")
 if os.path.exists(icon_path):
     root.iconbitmap(icon_path)
 else:
@@ -75,7 +76,6 @@ else:
     show_warning("Warning", "Default icon in use.")
 
 # logo image in GUI
-logo_path = os.path.join(base_path, "img/dbay-icon.png")
 if os.path.exists(logo_path):
     logo_image = tk.PhotoImage(file=logo_path)
 else:
@@ -105,11 +105,9 @@ style.configure("TCombobox", font=("Arial", 20), fieldbackground="white", backgr
 tk.Label(top_frame, text="Land:", font=("Arial", 16), bg="white", fg="black").grid(row=0, column=0, padx=5, pady=5, sticky="w")
 country_dropdown = ttk.Combobox(top_frame, textvariable=country_var, state="readonly", style="TCombobox", font=("Arial", 16))
 country_dropdown.grid(row=0, column=1, padx=5, pady=5, sticky="w")
-
 tk.Label(top_frame, text="Energieträger:", font=("Arial", 16), bg="white", fg="black").grid(row=1, column=0, padx=5, pady=5, sticky="w")
 energy_dropdown = ttk.Combobox(top_frame, textvariable=energy_var, state="readonly", style="TCombobox", font=("Arial", 16))
 energy_dropdown.grid(row=1, column=1, padx=5, pady=5, sticky="w")
-
 tk.Label(top_frame, text="Jahr:", font=("Arial", 16), bg="white", fg="black").grid(row=2, column=0, padx=5, pady=5, sticky="w")
 year_dropdown = ttk.Combobox(top_frame, textvariable=year_var, state="readonly", style="TCombobox", font=("Arial", 16))
 year_dropdown.grid(row=2, column=1, padx=5, pady=5, sticky="w")
@@ -126,7 +124,6 @@ for i, label in enumerate(["Maximaler Jahresverbrauch", "Durchschn. Jahresverbra
     stat_labels[label].grid(row=i, column=1, padx=5, pady=2)
 
 #----------------Malware check for CSV file---------------
-# function to check the CSV file for malicious code according to the client's security concept ^^
 def check_csv_for_malicious_code(file_path):
     suspicious_patterns = [
         r"^=",  
@@ -319,7 +316,6 @@ def update_pie_chart():
 #------------------Table------------------
 table_frame = tk.Frame(root, bg="white", bd=1, relief="solid")
 table_frame.pack(padx=10, pady=10)
-
 style.configure("Treeview", 
                 rowheight=25,
                 font=("Arial", 16),
@@ -335,11 +331,10 @@ style.map("Treeview",
           background=[("selected", "lightblue")],
           foreground=[("selected", "black")])
 style.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})])
-
 table = ttk.Treeview(table_frame, show="headings", height=10, style="Treeview")
 table.pack(side="left", padx=5, pady=5, fill="both", expand=True)
 
-# add scrollbar for the table
+# scrollbar for the table
 scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
 scrollbar.pack(side="right", fill="y")
 table.configure(yscrollcommand=scrollbar.set)
@@ -398,12 +393,11 @@ def display_data():
             max_value = df[selected_energy].max()
             mean_value = df[selected_energy].mean()
             min_value = df[selected_energy].min()
-
             stat_labels["Maximaler Jahresverbrauch"].config(text=f"{max_value:.2f} PJ")
             stat_labels["Durchschn. Jahresverbrauch"].config(text=f"{mean_value:.2f} PJ")
             stat_labels["Minimaler Jahresverbrauch"].config(text=f"{min_value:.2f} PJ")
 
-        # update Pie Chart based on selected year
+        # update pie chart based on selected year
         update_pie_chart()
     except Exception as e:
         log_error(f"Error displaying data for {selected_country}: {str(e)}. Data can't be displayed by the function.")
