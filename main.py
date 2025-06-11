@@ -26,8 +26,8 @@ base_path = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(base_path, "img/dbay-icon.png")
 icon_path = os.path.join(base_path, "img/dbay-icon.ico")
 file_path_de = r'data/Primärverbrauch DE.csv'
-file_path_fr = r'data/Primärverbrauch mehr Daten und Fehler.json'
-file_path_gb = r'data/Primärverbrauch GB (mit Fehlern).db'
+file_path_fr = r'data/Primärverbrauch FR.json'
+file_path_gb = r'data/Primärverbrauch GB.db'
 api_url = "http://localhost:8000/api/1/primary_energy_consumption"
 
 #------------Logging-----------
@@ -440,7 +440,7 @@ def display_data():
         show_error("Error displaying data", str(e), "Check the logs")
 
 # update dropdowns and load initial data
-country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "Polen", "Afrika"]
+country_dropdown['values'] = ["Deutschland", "Frankreich", "Großbritannien", "Polen"]
 country_dropdown.bind("<<ComboboxSelected>>", lambda e: load_csv_or_json_or_db_or_api())
 country_dropdown.current(0)
 load_csv_or_json_or_db_or_api()
